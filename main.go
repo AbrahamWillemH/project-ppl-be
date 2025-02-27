@@ -1,39 +1,17 @@
 package main
 
 import (
-	"fmt"
-	"net/http"
-
-	"github.com/gin-gonic/gin"
+	"log"
+	"project-ppl-be/config"
+	"project-ppl-be/server"
 )
 
 func main() {
-	// Create a Gin router
-	r := gin.Default()
+	// Initialize the database
+	config.ConnectDB()
+	defer config.CloseDB()
 
-	// Define a basic route
-	r.GET("/", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"message": "Welcome to Gin!",
-		})
-	})
-
-	// Ping test route
-	r.GET("/ping", func(c *gin.Context) {
-		fmt.Println("Ping endpoint was called") // Print in terminal
-		c.String(http.StatusOK, "pong")
-	})
-
-	// Dynamic route with parameters
-	r.GET("/user/:name", func(c *gin.Context) {
-		name := c.Param("name")
-		c.JSON(http.StatusOK, gin.H{
-			"user":    name,
-			"message": "Hello, " + name + "!",
-		})
-	})
-
-	// Run the server on port 8080
-	fmt.Println("Server is running at http://localhost:8000")
-	r.Run(":8000")
+	// Start the Gin server AFTER setting up the database
+	router := server.SetupRouter()
+	log.Fatal(router.Run(":8000"))
 }

@@ -5,6 +5,7 @@
 *.so
 *.dylib
 *.a
+.env
 
 # Go modules
 bin/
