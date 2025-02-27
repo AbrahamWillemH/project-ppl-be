@@ -28,23 +28,11 @@ func ConnectDB() {
 	// Connect to Neon PostgreSQL DB
 	conn, err := pgx.Connect(context.Background(), connStr)
 	if err != nil {
-		log.Fatalf("Failed to connect to CockroachDB: %v", err)
+		log.Fatalf("Failed to connect to PostgreSQL NeonDB: %v", err)
 	}
 
 	fmt.Println("Connected to CockroachDB!")
 	DB = conn
-
-	// Ensure the table exists
-	_, err = DB.Exec(context.Background(), `
-		CREATE TABLE IF NOT EXISTS playing_with_neon (
-			id SERIAL PRIMARY KEY,
-			name TEXT NOT NULL,
-			value REAL
-		);
-	`)
-	if err != nil {
-		log.Fatalf("Failed to create table: %v", err)
-	}
 
 	fmt.Println("Table check completed.")
 }

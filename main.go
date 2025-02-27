@@ -2,7 +2,9 @@ package main
 
 import (
 	"log"
+
 	"project-ppl-be/config"
+	_ "project-ppl-be/docs"
 	"project-ppl-be/server"
 )
 
