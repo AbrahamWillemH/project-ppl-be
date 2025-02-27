@@ -1,0 +1,32 @@
+# Binaries
+*.exe
+*.out
+*.dll
+*.so
+*.dylib
+*.a
+
+# Go modules
+bin/
+pkg/
+vendor/
+go.sum
+
+# Go cache & build artifacts
+*.log
+*.test
+*.tmp
+*.swp
+*.swo
+*.swm
+*.swp
+*.swx
+.coverage
+
+# VS Code & JetBrains IDE settings (if using)
+.vscode/
+.idea/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
