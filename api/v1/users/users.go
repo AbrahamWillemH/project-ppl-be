@@ -15,6 +15,7 @@ var userRepo = repo.UserRepository{}
 // @Summary Get Users
 // @Description Fetch all users from the database
 // @Tags Users
+// @Security BearerAuth
 // @Accept  json
 // @Produce  json
 // @Success 200 {array} models.User
@@ -33,6 +34,7 @@ func UserGetHandler(c *gin.Context) {
 // @Summary Create User
 // @Description Create a new user in the database
 // @Tags Users
+// @Security BearerAuth
 // @Accept  json
 // @Produce  json
 // @Param user body models.CreateUserRequest true "User data"

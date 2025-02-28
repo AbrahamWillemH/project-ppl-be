@@ -31,7 +31,7 @@ func ConnectDB() {
 		log.Fatalf("Failed to connect to PostgreSQL NeonDB: %v", err)
 	}
 
-	fmt.Println("Connected to CockroachDB!")
+	fmt.Println("Connected to PostgreSQL NeonDB!")
 	DB = conn
 
 	fmt.Println("Table check completed.")

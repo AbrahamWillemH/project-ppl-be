@@ -1,3 +1,14 @@
+// Package swagger Documentation
+//
+// @title Project PPL API
+// @version 0.1.3
+// @description API documentation for Project PPL BE
+// @schemes http
+//
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
+// @description Enter "Bearer {token}" to authenticate
 package main
 
 import (

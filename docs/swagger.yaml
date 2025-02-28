@@ -1,4 +1,14 @@
 definitions:
+  auth.LoginRequest:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    - username
+    type: object
   models.CreateUserRequest:
     properties:
       email:
@@ -30,7 +40,46 @@ definitions:
     type: object
 info:
   contact: {}
+  description: API documentation for Project PPL BE
+  title: Project PPL API
+  version: 0.1.3
 paths:
+  /api/v1/auth:
+    post:
+      consumes:
+      - application/json
+      description: Auth API to differentiate roles
+      parameters:
+      - description: Login Credentials
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/auth.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Login authentication
+      tags:
+      - Auth
   /api/v1/ping:
     get:
       consumes:
@@ -60,6 +109,8 @@ paths:
             items:
               $ref: '#/definitions/models.User'
             type: array
+      security:
+      - BearerAuth: []
       summary: Get Users
       tags:
       - Users
@@ -81,7 +132,17 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/models.User'
+      security:
+      - BearerAuth: []
       summary: Create User
       tags:
       - Users
+schemes:
+- http
+securityDefinitions:
+  BearerAuth:
+    description: Enter "Bearer {token}" to authenticate
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"
