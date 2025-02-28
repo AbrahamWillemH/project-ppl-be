@@ -2,12 +2,12 @@ package main
 
 import (
 	"log"
-
-	"github.com/gin-contrib/cors"
-
+	"net/http"
 	"project-ppl-be/config"
 	_ "project-ppl-be/docs"
 	"project-ppl-be/server"
+
+	"github.com/rs/cors"
 )
 
 func main() {
@@ -15,15 +15,15 @@ func main() {
 	config.ConnectDB()
 	defer config.CloseDB()
 
-	// Start the Gin server AFTER setting up the database
+	// Set up the Gin router
 	router := server.SetupRouter()
-	router.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"*"},
-		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
-		ExposeHeaders:    []string{"Content-Length"},
-		AllowCredentials: true,
-	}))
 
-	log.Fatal(router.Run(":8000"))
+	// Create a CORS wrapper with default settings
+	corsHandler := cors.Default()
+
+	// Wrap the Gin router with CORS
+	handler := corsHandler.Handler(router)
+
+	// Start the server with the wrapped handler
+	log.Fatal(http.ListenAndServe(":8000", handler))
 }

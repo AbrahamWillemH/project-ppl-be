@@ -2,7 +2,6 @@ package server
 
 import (
 	"fmt"
-
 	v1 "project-ppl-be/api/v1"
 	users "project-ppl-be/api/v1/users"
 
@@ -26,5 +25,6 @@ func SetupRouter() *gin.Engine {
 	}
 
 	fmt.Println("Server is running at http://localhost:8000")
+
 	return router
 }
