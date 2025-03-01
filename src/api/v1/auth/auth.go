@@ -3,7 +3,7 @@ package auth
 import (
 	"context"
 	"net/http"
-	"project-ppl-be/repo"
+	"project-ppl-be/src/repo"
 
 	"github.com/gin-gonic/gin"
 )

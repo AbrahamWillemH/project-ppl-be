@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"project-ppl-be/config"
-	"project-ppl-be/models"
+	"project-ppl-be/src/models"
 
 	"github.com/golang-jwt/jwt"
 	"github.com/huandu/go-sqlbuilder"

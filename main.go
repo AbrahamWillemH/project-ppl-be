@@ -2,7 +2,7 @@
 //
 // @title Project PPL API
 // @version 0.1.3
-// @description API documentation for Project PPL BE
+// @description API documentation for Project PPL - Kuda Hitam
 // @schemes http
 //
 // @securityDefinitions.apikey BearerAuth
@@ -16,7 +16,7 @@ import (
 	"net/http"
 	"project-ppl-be/config"
 	_ "project-ppl-be/docs"
-	"project-ppl-be/server"
+	"project-ppl-be/src/server"
 
 	"github.com/rs/cors"
 )

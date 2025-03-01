@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"project-ppl-be/config"
-	"project-ppl-be/models"
+	"project-ppl-be/src/models"
 
 	"github.com/huandu/go-sqlbuilder"
 	"golang.org/x/crypto/bcrypt"
@@ -14,28 +14,58 @@ import (
 type UserRepository struct{}
 
 // GetAllUsers retrieves all users from the database
-func (r *UserRepository) GetAllUsers(ctx context.Context) ([]models.User, error) {
+func (r *UserRepository) GetAllUsers(ctx context.Context, page, pageSize int, role string, sortByUsername bool) ([]models.User, int, error) {
 	sb := sqlbuilder.NewSelectBuilder()
-	sb.Select("id", "username", "email", "password", "role").From("users")
+	sb.Select("id", "username", "email", "role").
+		From("users").
+		Limit(pageSize).
+		Offset((page - 1) * pageSize) // OFFSET = (page - 1) * pageSize
 
-	query, args := sb.Build()
+	// Tambahkan filter berdasarkan role jika ada
+	if role != "" {
+		sb.Where(sb.Equal("role", role))
+	}
+
+	// Sorting berdasarkan username jika diaktifkan
+	if sortByUsername {
+		sb.OrderBy("username ASC")
+	} else {
+		sb.OrderBy("username DESC")
+	}
+
+	query, args := sb.BuildWithFlavor(sqlbuilder.PostgreSQL)
 	rows, err := config.DB.Query(ctx, query, args...)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 	defer rows.Close()
 
 	var users []models.User
 	for rows.Next() {
 		var user models.User
-		err := rows.Scan(&user.ID, &user.Username, &user.Email, &user.Password, &user.Role)
+		err := rows.Scan(&user.ID, &user.Username, &user.Email, &user.Role)
 		if err != nil {
-			return nil, err
+			return nil, 0, err
 		}
 		users = append(users, user)
 	}
 
-	return users, nil
+	// Hitung total jumlah data untuk pagination
+	countQuery := "SELECT COUNT(*) FROM users"
+	if role != "" {
+		countQuery += " WHERE role = $1"
+	}
+	var total int
+	if role != "" {
+		err = config.DB.QueryRow(ctx, countQuery, role).Scan(&total)
+	} else {
+		err = config.DB.QueryRow(ctx, countQuery).Scan(&total)
+	}
+	if err != nil {
+		return nil, 0, err
+	}
+
+	return users, total, nil
 }
 
 // CreateUser inserts a new user into the database

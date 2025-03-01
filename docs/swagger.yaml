@@ -9,6 +9,28 @@ definitions:
     - password
     - username
     type: object
+  models.CreateStudentRequest:
+    properties:
+      grade:
+        type: string
+      name:
+        type: string
+      nis:
+        type: string
+      status:
+        type: string
+    type: object
+  models.CreateTeacherRequest:
+    properties:
+      name:
+        type: string
+      nip:
+        type: string
+      specialization:
+        type: string
+      status:
+        type: string
+    type: object
   models.CreateUserRequest:
     properties:
       email:
@@ -25,6 +47,46 @@ definitions:
     - role
     - username
     type: object
+  models.Student:
+    properties:
+      curr_score:
+        type: string
+      grade:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      nis:
+        type: string
+      phone_number:
+        type: string
+      profile_picture_url:
+        type: string
+      status:
+        type: string
+      user_id:
+        type: string
+    type: object
+  models.Teacher:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+      nip:
+        type: string
+      phone_number:
+        type: string
+      profile_picture_url:
+        type: string
+      specialization:
+        type: string
+      status:
+        type: string
+      user_id:
+        type: string
+    type: object
   models.User:
     properties:
       email:
@@ -40,7 +102,7 @@ definitions:
     type: object
 info:
   contact: {}
-  description: API documentation for Project PPL BE
+  description: API documentation for Project PPL - Kuda Hitam
   title: Project PPL API
   version: 0.1.3
 paths:
@@ -95,20 +157,155 @@ paths:
       summary: Ping the server
       tags:
       - HealthCheck
-  /api/v1/users:
+  /api/v1/students:
     get:
       consumes:
       - application/json
-      description: Fetch all users from the database
+      description: Fetch all students from the database with pagination, filtering
+        by grade, and sorting by NIS
+      parameters:
+      - description: 'Page number (default: 1)'
+        in: query
+        name: page
+        type: integer
+      - description: 'Number of items per page (default: 40)'
+        in: query
+        name: pageSize
+        type: integer
+      - description: Filter by grade (e.g., '10')
+        in: query
+        name: grade
+        type: string
+      - description: Sort by NIS (true for ascending, false for descending)
+        in: query
+        name: sortByNIS
+        type: boolean
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            items:
-              $ref: '#/definitions/models.User'
-            type: array
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get Students
+      tags:
+      - Students
+    post:
+      consumes:
+      - application/json
+      description: Create a new student in the database
+      parameters:
+      - description: Student data
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateStudentRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Student'
+      security:
+      - BearerAuth: []
+      summary: Create Student
+      tags:
+      - Students
+  /api/v1/teachers:
+    get:
+      consumes:
+      - application/json
+      description: Fetch all teachers from the database with pagination, filtering
+        by specialization, and sorting by NIP
+      parameters:
+      - description: 'Page number (default: 1)'
+        in: query
+        name: page
+        type: integer
+      - description: 'Number of items per page (default: 40)'
+        in: query
+        name: pageSize
+        type: integer
+      - description: Filter by specialization (e.g., 'IPA')
+        in: query
+        name: specialization
+        type: string
+      - description: Sort by NIP (true for ascending, false for descending)
+        in: query
+        name: sortByNIP
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get Teachers
+      tags:
+      - Teachers
+    post:
+      consumes:
+      - application/json
+      description: Create a new teacher in the database
+      parameters:
+      - description: Teacher data
+        in: body
+        name: teacher
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateTeacherRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Teacher'
+      security:
+      - BearerAuth: []
+      summary: Create Teacher
+      tags:
+      - Teachers
+  /api/v1/users:
+    get:
+      consumes:
+      - application/json
+      description: Fetch all users from the database with pagination, filtering by
+        role, and sorting by username
+      parameters:
+      - description: 'Page number (default: 1)'
+        in: query
+        name: page
+        type: integer
+      - description: 'Number of items per page (default: 40)'
+        in: query
+        name: pageSize
+        type: integer
+      - description: Filter by role (e.g., 'admin', 'student')
+        in: query
+        name: role
+        type: string
+      - description: Sort by username (true for ascending, false for descending)
+        in: query
+        name: sortByUsername
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
       security:
       - BearerAuth: []
       summary: Get Users
