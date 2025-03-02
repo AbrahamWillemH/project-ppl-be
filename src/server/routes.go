@@ -46,6 +46,7 @@ func SetupRouter() *gin.Engine {
 		teachersGroup.Use(middleware.AuthMiddleware()) // Pasang middleware di sini
 		teachersGroup.GET("", teachers.TeachersGetHandler)
 		teachersGroup.POST("", teachers.TeachersPostHandler)
+		teachersGroup.PATCH("", teachers.TeachersUpdateHandler)
 	}
 
 	fmt.Println("Server is running at http://localhost:8000")

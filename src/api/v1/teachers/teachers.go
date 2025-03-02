@@ -1,4 +1,4 @@
-package users
+package teachers
 
 import (
 	"context"
@@ -86,5 +86,53 @@ func TeachersPostHandler(c *gin.Context) {
 	}
 
 	// Respond with the created teacher
+	c.JSON(http.StatusOK, teacher)
+}
+
+// TeachersUpdateHandler updates an existing teacher
+// @Summary Update Teacher
+// @Description Updates an existing teacher in the database
+// @Tags Teachers
+// @Security BearerAuth
+// @Accept  json
+// @Produce  json
+// @Param id query int true "Teacher ID"
+// @Param teacher body models.UpdateTeacherRequest true "Updated Teacher Data"
+// @Success 200 {object} models.Teacher
+// @Router /api/v1/teachers [patch]
+func TeachersUpdateHandler(c *gin.Context) {
+	var req models.UpdateTeacherRequest
+
+	// Extract `id` from query parameters
+	idStr := c.Query("id") // This will get the ID from query params
+	id, err := strconv.Atoi(idStr)
+	if err != nil || id <= 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid or missing teacher ID"})
+		return
+	}
+
+	// Parse JSON request body
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Call UpdateTeacher dengan id yang sudah diambil dari query parameters
+	teacher, err := teacherRepo.UpdateTeacher(
+		context.Background(),
+		id,
+		req.Name,
+		req.NIP,
+		req.PhoneNumber,
+		req.Specialization,
+		req.Status,
+		req.ProfilePictureURL,
+	)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Respond dengan teacher yang sudah diperbarui
 	c.JSON(http.StatusOK, teacher)
 }

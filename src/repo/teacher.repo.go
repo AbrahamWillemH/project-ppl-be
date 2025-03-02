@@ -96,3 +96,42 @@ func (r *TeacherRepository) CreateTeacher(ctx context.Context, name, nip, specia
 		Status:         status,
 	}, nil
 }
+
+// UpdateTeacher update an existing teacher
+func (r *TeacherRepository) UpdateTeacher(ctx context.Context, id int, name, nip, phone_number, specialization, status, profile_picture_url string) (models.Teacher, error) {
+	sb := sqlbuilder.NewUpdateBuilder()
+	sb.Update("teachers").
+		Set(
+			sb.Assign("name", name),
+			sb.Assign("nip", nip),
+			sb.Assign("phone_number", phone_number),
+			sb.Assign("specialization", specialization),
+			sb.Assign("status", status),
+			sb.Assign("profile_picture_url", profile_picture_url),
+		).
+		Where(sb.Equal("id", id)).
+		Returning("id", "name", "nip", "phone_number", "specialization", "status", "profile_picture_url")
+
+	// Convert query to PostgreSQL-style placeholders
+	query, args := sb.BuildWithFlavor(sqlbuilder.PostgreSQL)
+
+	fmt.Println("Generated Query:", query)
+	fmt.Println("Query Args:", args)
+
+	// Scan hasil update ke dalam struct
+	var teacher models.Teacher
+	err := config.DB.QueryRow(ctx, query, args...).Scan(
+		&teacher.ID,
+		&teacher.Name,
+		&teacher.NIP,
+		&teacher.Phone_Number,
+		&teacher.Specialization,
+		&teacher.Status,
+		&teacher.Profile_Picture_URL,
+	)
+	if err != nil {
+		return models.Teacher{}, err
+	}
+
+	return teacher, nil
+}

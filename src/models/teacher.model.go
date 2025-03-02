@@ -19,3 +19,12 @@ type CreateTeacherRequest struct {
 	Specialization string `json:"specialization" db:"specialization"`
 	Status         string `json:"status" db:"status"`
 }
+
+type UpdateTeacherRequest struct {
+	Name								string  `json:"name" db:"name"`
+	NIP									string  `json:"nip" db:"nip"`
+	Phone_Number        *string	`json:"phone_number" db:"phone_number"`
+	Specialization			string  `json:"specialization" db:"specialization"`
+	Status							string  `json:"status" db:"status"`
+	Profile_Picture_URL *string `json:"profile_picture_url" db:"profile_picture_url"`
+}

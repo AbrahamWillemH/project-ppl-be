@@ -87,6 +87,21 @@ definitions:
       user_id:
         type: string
     type: object
+  models.UpdateTeacherRequest:
+    properties:
+      name:
+        type: string
+      nip:
+        type: string
+      phone_number:
+        type: string
+      profile_picture_url:
+        type: string
+      specialization:
+        type: string
+      status:
+        type: string
+    type: object
   models.User:
     properties:
       email:
@@ -250,6 +265,34 @@ paths:
       security:
       - BearerAuth: []
       summary: Get Teachers
+      tags:
+      - Teachers
+    patch:
+      consumes:
+      - application/json
+      description: Updates an existing teacher in the database
+      parameters:
+      - description: Teacher ID
+        in: query
+        name: id
+        required: true
+        type: integer
+      - description: Updated Teacher Data
+        in: body
+        name: teacher
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdateTeacherRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Teacher'
+      security:
+      - BearerAuth: []
+      summary: Update Teacher
       tags:
       - Teachers
     post:
