@@ -13,14 +13,14 @@ import (
 type TeacherRepository struct{}
 
 // GetAllTeachers retrieves all teachers from the database
-func (r *TeacherRepository) GetAllStudents(ctx context.Context, page, pageSize int, specialization string, sortByNIP bool) ([]models.Teacher, int, error) {
+func (r *TeacherRepository) GetAllTeachers(ctx context.Context, page, pageSize int, specialization string, sortByNIP bool) ([]models.Teacher, int, error) {
 	sb := sqlbuilder.NewSelectBuilder()
 	sb.Select("id", "name", "nip", "phone_number", "specialization", "status", "profile_picture_url", "user_id").
 		From("teachers").
 		Limit(pageSize).
 		Offset((page - 1) * pageSize) // OFFSET = (page - 1) * pageSize
 
-	// Tambahkan filter berdasarkan specialization jika ada
+	// Add specialization taken from params
 	if specialization != "" {
 		sb.Where(sb.Equal("specialization", specialization))
 	}
@@ -98,40 +98,51 @@ func (r *TeacherRepository) CreateTeacher(ctx context.Context, name, nip, specia
 }
 
 // UpdateTeacher update an existing teacher
-func (r *TeacherRepository) UpdateTeacher(ctx context.Context, id int, name, nip, phone_number, specialization, status, profile_picture_url string) (models.Teacher, error) {
-	sb := sqlbuilder.NewUpdateBuilder()
-	sb.Update("teachers").
-		Set(
-			sb.Assign("name", name),
-			sb.Assign("nip", nip),
-			sb.Assign("phone_number", phone_number),
-			sb.Assign("specialization", specialization),
-			sb.Assign("status", status),
-			sb.Assign("profile_picture_url", profile_picture_url),
-		).
-		Where(sb.Equal("id", id)).
-		Returning("id", "name", "nip", "phone_number", "specialization", "status", "profile_picture_url")
+func (r *TeacherRepository) UpdateTeacher(
+    ctx context.Context,
+    id int,
+    name, nip, phone_number, specialization, status, profile_picture_url string,
+) (models.Teacher, error) {
 
-	// Convert query to PostgreSQL-style placeholders
-	query, args := sb.BuildWithFlavor(sqlbuilder.PostgreSQL)
+    // Build the update query without Returning method
+    sb := sqlbuilder.NewUpdateBuilder()
+    sb.Update("teachers").
+        Set(
+            sb.Assign("name", name),
+            sb.Assign("nip", nip),
+            sb.Assign("phone_number", phone_number),
+            sb.Assign("specialization", specialization),
+            sb.Assign("status", status),
+            sb.Assign("profile_picture_url", profile_picture_url),
+        ).
+        Where(sb.Equal("id", id))
 
-	fmt.Println("Generated Query:", query)
-	fmt.Println("Query Args:", args)
+    // Generate the query and arguments for PostgreSQL
+    query, args := sb.BuildWithFlavor(sqlbuilder.PostgreSQL)
 
-	// Scan hasil update ke dalam struct
-	var teacher models.Teacher
-	err := config.DB.QueryRow(ctx, query, args...).Scan(
-		&teacher.ID,
-		&teacher.Name,
-		&teacher.NIP,
-		&teacher.Phone_Number,
-		&teacher.Specialization,
-		&teacher.Status,
-		&teacher.Profile_Picture_URL,
-	)
-	if err != nil {
-		return models.Teacher{}, err
-	}
+    // Append the RETURNING clause manually
+    query += " RETURNING id, name, nip, phone_number, specialization, status, profile_picture_url"
 
-	return teacher, nil
+    fmt.Println("Generated Query:", query)
+    fmt.Println("Query Args:", args)
+
+    // Prepare the result struct
+    var teacher models.Teacher
+
+    // Execute the query and scan the result into the teacher struct
+    err := config.DB.QueryRow(ctx, query, args...).Scan(
+        &teacher.ID,
+        &teacher.Name,
+        &teacher.NIP,
+        &teacher.Phone_Number,
+        &teacher.Specialization,
+        &teacher.Status,
+        &teacher.Profile_Picture_URL,
+    )
+    if err != nil {
+        return models.Teacher{}, err
+    }
+
+    // Return the updated teacher
+    return teacher, nil
 }

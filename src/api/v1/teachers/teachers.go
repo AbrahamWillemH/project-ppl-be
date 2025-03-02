@@ -41,7 +41,7 @@ func TeachersGetHandler(c *gin.Context) {
 	}
 
 	// Ambil data dengan pagination dan filter specialization
-	students, total, err := teacherRepo.GetAllStudents(context.Background(), page, pageSize, specialization, sortByNIP)
+	students, total, err := teacherRepo.GetAllTeachers(context.Background(), page, pageSize, specialization, sortByNIP)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -117,22 +117,34 @@ func TeachersUpdateHandler(c *gin.Context) {
 		return
 	}
 
-	// Call UpdateTeacher dengan id yang sudah diambil dari query parameters
+	// Handle nil pointers for Phone_Number and Profile_Picture_URL
+	phoneNumber := ""
+	if req.Phone_Number != nil {
+		phoneNumber = *req.Phone_Number // Dereference the pointer to get the string value
+	}
+
+	profilePictureURL := ""
+	if req.Profile_Picture_URL != nil {
+		profilePictureURL = *req.Profile_Picture_URL // Dereference the pointer to get the string value
+	}
+
+	// Call UpdateTeacher with the correct parameters
 	teacher, err := teacherRepo.UpdateTeacher(
 		context.Background(),
 		id,
 		req.Name,
 		req.NIP,
-		req.PhoneNumber,
+		phoneNumber,         // Pass the dereferenced phone number
 		req.Specialization,
 		req.Status,
-		req.ProfilePictureURL,
+		profilePictureURL,   // Pass the dereferenced profile picture URL
 	)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	// Respond dengan teacher yang sudah diperbarui
+	// Respond with the updated teacher
 	c.JSON(http.StatusOK, teacher)
 }
+
