@@ -147,4 +147,3 @@ func TeachersUpdateHandler(c *gin.Context) {
 	// Respond with the updated teacher
 	c.JSON(http.StatusOK, teacher)
 }
-
