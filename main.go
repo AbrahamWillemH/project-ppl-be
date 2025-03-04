@@ -3,7 +3,7 @@
 // @title Project PPL API
 // @version 0.1.3
 // @description API documentation for Project PPL - Kuda Hitam
-// @schemes http
+// @schemes http https
 //
 // @securityDefinitions.apikey BearerAuth
 // @in header

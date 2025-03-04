@@ -379,6 +379,7 @@ paths:
       - Users
 schemes:
 - http
+- https
 securityDefinitions:
   BearerAuth:
     description: Enter "Bearer {token}" to authenticate

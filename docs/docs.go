@@ -607,7 +607,7 @@ var SwaggerInfo = &swag.Spec{
 	Version:          "0.1.3",
 	Host:             "",
 	BasePath:         "",
-	Schemes:          []string{"http"},
+	Schemes:          []string{"http", "https"},
 	Title:            "Project PPL API",
 	Description:      "API documentation for Project PPL - Kuda Hitam",
 	InfoInstanceName: "swagger",
