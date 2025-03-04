@@ -36,5 +36,5 @@ func main() {
 	handler := corsHandler.Handler(router)
 
 	// Start the server with the wrapped handler
-	log.Fatal(http.ListenAndServe(":8000", handler))
+	log.Fatal(http.ListenAndServe(":8080", handler))
 }
