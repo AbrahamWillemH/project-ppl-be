@@ -49,7 +49,7 @@ func SetupRouter() *gin.Engine {
 		teachersGroup.PATCH("", teachers.TeachersUpdateHandler)
 	}
 
-	fmt.Println("Server is running at http://localhost:8000")
+	fmt.Println("Server is running at http://localhost:8080")
 
 	return router
 }

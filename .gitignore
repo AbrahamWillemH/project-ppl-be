@@ -12,6 +12,7 @@ bin/
 pkg/
 vendor/
 go.sum
+tmp/
 
 # Go cache & build artifacts
 *.log
