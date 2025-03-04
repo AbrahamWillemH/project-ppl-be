@@ -30,7 +30,12 @@ func main() {
 	router := server.SetupRouter()
 
 	// Create a CORS wrapper with default settings
-	corsHandler := cors.Default()
+	corsHandler := cors.New(cors.Options{
+	    AllowedOrigins:   []string{"http://localhost:5173"}, // Allow only your frontend
+	    AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+	    AllowedHeaders:   []string{"Authorization", "Content-Type"},
+	    AllowCredentials: true,
+	})
 
 	// Wrap the Gin router with CORS
 	handler := corsHandler.Handler(router)
