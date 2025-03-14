@@ -148,7 +148,7 @@ func (r *StudentRepository) UpdateStudent(
 	return student, nil
 }
 
-// DeleteTeacher deletes a student from the database
+// DeleteSTudent deletes a student from the database
 func (r *StudentRepository) DeleteStudent(ctx context.Context, id int) error {
 	sb := sqlbuilder.NewDeleteBuilder()
 	sb.DeleteFrom("students").Where(sb.Equal("id", id))

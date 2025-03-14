@@ -5,6 +5,7 @@ import (
 	"project-ppl-be/middleware"
 	v1 "project-ppl-be/src/api/v1"
 	auth "project-ppl-be/src/api/v1/auth"
+	materials "project-ppl-be/src/api/v1/materials"
 	students "project-ppl-be/src/api/v1/students"
 	teachers "project-ppl-be/src/api/v1/teachers"
 	users "project-ppl-be/src/api/v1/users"
@@ -55,6 +56,10 @@ func SetupRouter() *gin.Engine {
 		// Materials group
 		materialsGroup := v1Group.Group("/materials")
 		materialsGroup.Use(middleware.AuthMiddleware())
+		materialsGroup.GET("", materials.MaterialsGetHandler)
+		materialsGroup.POST("", materials.MaterialsPostHandler)
+		materialsGroup.PATCH("", materials.MaterialsUpdateHandler)
+		materialsGroup.DELETE("", materials.MaterialsDeleteHandler)
 	}
 
 	fmt.Println("Server is running at http://localhost:8080")

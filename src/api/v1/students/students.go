@@ -97,7 +97,7 @@ func StudentPostHandler(c *gin.Context) {
 // @Accept  json
 // @Produce  json
 // @Param id query int true "Student ID"
-// @Param teacher body models.UpdateStudentRequest true "Updated Student Data"
+// @Param student body models.UpdateStudentRequest true "Updated Student Data"
 // @Success 200 {object} models.Student
 // @Router /api/v1/students [patch]
 func StudentUpdateHandler(c *gin.Context) {
@@ -128,7 +128,7 @@ func StudentUpdateHandler(c *gin.Context) {
 		profilePictureURL = *req.Profile_Picture_URL // Dereference the pointer to get the string value
 	}
 
-	// Call UpdateTeacher with the correct parameters
+	// Call UpdateStudent with the correct parameters
 	student, err := studentRepo.UpdateStudent(
 		context.Background(),
 		id,
@@ -145,7 +145,7 @@ func StudentUpdateHandler(c *gin.Context) {
 		return
 	}
 
-	// Respond with the updated teacher
+	// Respond with the updated student
 	c.JSON(http.StatusOK, student)
 }
 
@@ -164,11 +164,11 @@ func StudentDeleteHandler(c *gin.Context) {
 	idStr := c.Query("id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil || id <= 0 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid or missing teacher ID"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid or missing student ID"})
 		return
 	}
 
-	// Call DeleteTeacher function from repository
+	// Call DeleteStudent function from repository
 	err = studentRepo.DeleteStudent(context.Background(), id)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})

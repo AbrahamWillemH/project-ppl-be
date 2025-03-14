@@ -9,6 +9,19 @@ definitions:
     - password
     - username
     type: object
+  models.CreateMaterialRequest:
+    properties:
+      class_id:
+        type: integer
+      content:
+        type: integer
+      description:
+        type: string
+      teacher_id:
+        type: integer
+      title:
+        type: string
+    type: object
   models.CreateStudentRequest:
     properties:
       grade:
@@ -46,6 +59,21 @@ definitions:
     - password
     - role
     - username
+    type: object
+  models.Material:
+    properties:
+      class_id:
+        type: integer
+      content:
+        type: integer
+      description:
+        type: string
+      id:
+        type: integer
+      teacher_id:
+        type: integer
+      title:
+        type: string
     type: object
   models.Student:
     properties:
@@ -85,6 +113,19 @@ definitions:
       status:
         type: string
       user_id:
+        type: string
+    type: object
+  models.UpdateMaterialRequest:
+    properties:
+      class_id:
+        type: integer
+      content:
+        type: integer
+      description:
+        type: string
+      teacher_id:
+        type: integer
+      title:
         type: string
     type: object
   models.UpdateStudentRequest:
@@ -136,7 +177,7 @@ info:
   contact: {}
   description: API documentation for Project PPL - Kuda Hitam
   title: Project PPL API
-  version: 0.1.3
+  version: 0.2.0
 paths:
   /api/v1/auth:
     post:
@@ -174,6 +215,108 @@ paths:
       summary: Login authentication
       tags:
       - Auth
+  /api/v1/materials:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes a material from the database by ID
+      parameters:
+      - description: Material ID
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete Material
+      tags:
+      - Materials
+    get:
+      consumes:
+      - application/json
+      description: Fetch all materials from the database with pagination
+      parameters:
+      - description: 'Page number (default: 1)'
+        in: query
+        name: page
+        type: integer
+      - description: 'Number of items per page (default: 15)'
+        in: query
+        name: pageSize
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get Materials
+      tags:
+      - Materials
+    patch:
+      consumes:
+      - application/json
+      description: Updates an existing material in the database
+      parameters:
+      - description: Material ID
+        in: query
+        name: id
+        required: true
+        type: integer
+      - description: Updated Material Data
+        in: body
+        name: material
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdateMaterialRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Material'
+      security:
+      - BearerAuth: []
+      summary: Update Material
+      tags:
+      - Materials
+    post:
+      consumes:
+      - application/json
+      description: Create a new material in the database
+      parameters:
+      - description: Material data
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateMaterialRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Material'
+      security:
+      - BearerAuth: []
+      summary: Create Material
+      tags:
+      - Materials
   /api/v1/ping:
     get:
       consumes:
@@ -261,7 +404,7 @@ paths:
         type: integer
       - description: Updated Student Data
         in: body
-        name: teacher
+        name: student
         required: true
         schema:
           $ref: '#/definitions/models.UpdateStudentRequest'
