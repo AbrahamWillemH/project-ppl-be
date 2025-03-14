@@ -29,24 +29,28 @@ func SetupRouter() *gin.Engine {
 		// Auth
 		v1Group.POST("/auth", auth.AuthHandler)
 
-		//Users group
+		// Users group
 		usersGroup := v1Group.Group("/users")
 		usersGroup.Use(middleware.AuthMiddleware()) // Pasang middleware di sini
 		usersGroup.GET("", users.UserGetHandler)
 		usersGroup.POST("", users.UserPostHandler)
+		usersGroup.PATCH("", users.UserUpdateHandler)
 
-		//Students group
+		// Students group
 		studentsGroup := v1Group.Group("/students")
 		studentsGroup.Use(middleware.AuthMiddleware()) // Pasang middleware di sini
 		studentsGroup.GET("", students.StudentsGetHandler)
 		studentsGroup.POST("", students.StudentPostHandler)
+		studentsGroup.PATCH("", students.StudentUpdateHandler)
+		studentsGroup.DELETE("", students.StudentDeleteHandler)
 
-		//Teachers group
+		// Teachers group
 		teachersGroup := v1Group.Group("/teachers")
 		teachersGroup.Use(middleware.AuthMiddleware()) // Pasang middleware di sini
 		teachersGroup.GET("", teachers.TeachersGetHandler)
 		teachersGroup.POST("", teachers.TeachersPostHandler)
 		teachersGroup.PATCH("", teachers.TeachersUpdateHandler)
+		teachersGroup.DELETE("", teachers.TeachersDeleteHandler)
 	}
 
 	fmt.Println("Server is running at http://localhost:8080")

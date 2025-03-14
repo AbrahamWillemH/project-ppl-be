@@ -6,8 +6,8 @@ type Student struct {
 	Name                string  `json:"name" db:"name"`
 	NIS                 string  `json:"nis" db:"nis"`
 	Phone_Number        *string `json:"phone_number" db:"phone_number"`
-	Grade               string  `json:"grade" db:"grade"`
-	Current_Score       *string `json:"curr_score" db:"curr_score"`
+	Grade               int     `json:"grade" db:"grade"`
+	Current_Score       *int    `json:"curr_score" db:"curr_score"`
 	Status              string  `json:"status" db:"status"`
 	Profile_Picture_URL *string `json:"profile_picture_url" db:"profile_picture_url"`
 	User_ID             string  `json:"user_id" db:"user_id"`
@@ -17,6 +17,16 @@ type Student struct {
 type CreateStudentRequest struct {
 	Name   string `json:"name" db:"name"`
 	NIS    string `json:"nis" db:"nis"`
-	Grade  string `json:"grade" db:"grade"`
+	Grade  int    `json:"grade" db:"grade"`
 	Status string `json:"status" db:"status"`
+}
+
+type UpdateStudentRequest struct {
+	Name                string  `json:"name" db:"name"`
+	NIS                 string  `json:"nis" db:"nis"`
+	Phone_Number        *string `json:"phone_number" db:"phone_number"`
+	Grade               int     `json:"grade" db:"grade"`
+	Status              string  `json:"status" db:"status"`
+	Current_Score       *int    `json:"curr_score" db:"curr_score"`
+	Profile_Picture_URL *string `json:"profile_picture_url" db:"profile_picture_url"`
 }

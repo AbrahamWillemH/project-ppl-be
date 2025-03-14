@@ -68,7 +68,7 @@ func (r *StudentRepository) GetAllStudents(ctx context.Context, page, pageSize i
 }
 
 // CreateStudent inserts a new student into the database
-func (r *StudentRepository) CreateStudent(ctx context.Context, name, nis, grade, status string) (models.Student, error) {
+func (r *StudentRepository) CreateStudent(ctx context.Context, name string, nis string, grade int, status string) (models.Student, error) {
 	sb := sqlbuilder.NewInsertBuilder()
 	sb.InsertInto("students").
 		Cols("name", "nis", "grade", "status").
@@ -95,4 +95,69 @@ func (r *StudentRepository) CreateStudent(ctx context.Context, name, nis, grade,
 		Grade:  grade,
 		Status: status,
 	}, nil
+}
+
+// UpdateStudent update an existing student
+func (r *StudentRepository) UpdateStudent(
+	ctx context.Context,
+	id int,
+	name string, nis string, phone_number string, grade int, status string, curr_score *int, profile_picture_url string,
+) (models.Student, error) {
+	// Build the update query without Returning method
+	sb := sqlbuilder.NewUpdateBuilder()
+	sb.Update("students").
+		Set(
+			sb.Assign("name", name),
+			sb.Assign("nis", nis),
+			sb.Assign("phone_number", phone_number),
+			sb.Assign("grade", grade),
+			sb.Assign("status", status),
+			sb.Assign("curr_score", curr_score),
+			sb.Assign("profile_picture_url", profile_picture_url),
+		).
+		Where(sb.Equal("id", id))
+
+	// Generate the query and arguments for PostgreSQL
+	query, args := sb.BuildWithFlavor(sqlbuilder.PostgreSQL)
+
+	// Append the RETURNING clause manually
+	query += " RETURNING id, name, nis, phone_number, grade, status, curr_score, profile_picture_url"
+
+	fmt.Println("Generated Query:", query)
+	fmt.Println("Query Args:", args)
+
+	// Prepare the result struct
+	var student models.Student
+
+	// Execute the query and scan the result into the student struct
+	err := config.DB.QueryRow(ctx, query, args...).Scan(
+		&student.ID,
+		&student.Name,
+		&student.NIS,
+		&student.Phone_Number,
+		&student.Grade,
+		&student.Status,
+		&student.Current_Score,
+		&student.Profile_Picture_URL,
+	)
+	if err != nil {
+		return models.Student{}, err
+	}
+
+	// Return the updated student
+	return student, nil
+}
+
+// DeleteTeacher deletes a student from the database
+func (r *StudentRepository) DeleteStudent(ctx context.Context, id int) error {
+	sb := sqlbuilder.NewDeleteBuilder()
+	sb.DeleteFrom("students").Where(sb.Equal("id", id))
+	query, args := sb.BuildWithFlavor(sqlbuilder.PostgreSQL)
+
+	_, err := config.DB.Exec(ctx, query, args...)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

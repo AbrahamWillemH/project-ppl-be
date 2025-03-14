@@ -99,50 +99,63 @@ func (r *TeacherRepository) CreateTeacher(ctx context.Context, name, nip, specia
 
 // UpdateTeacher update an existing teacher
 func (r *TeacherRepository) UpdateTeacher(
-    ctx context.Context,
-    id int,
-    name, nip, phone_number, specialization, status, profile_picture_url string,
+	ctx context.Context,
+	id int,
+	name, nip, phone_number, specialization, status, profile_picture_url string,
 ) (models.Teacher, error) {
+	// Build the update query without Returning method
+	sb := sqlbuilder.NewUpdateBuilder()
+	sb.Update("teachers").
+		Set(
+			sb.Assign("name", name),
+			sb.Assign("nip", nip),
+			sb.Assign("phone_number", phone_number),
+			sb.Assign("specialization", specialization),
+			sb.Assign("status", status),
+			sb.Assign("profile_picture_url", profile_picture_url),
+		).
+		Where(sb.Equal("id", id))
 
-    // Build the update query without Returning method
-    sb := sqlbuilder.NewUpdateBuilder()
-    sb.Update("teachers").
-        Set(
-            sb.Assign("name", name),
-            sb.Assign("nip", nip),
-            sb.Assign("phone_number", phone_number),
-            sb.Assign("specialization", specialization),
-            sb.Assign("status", status),
-            sb.Assign("profile_picture_url", profile_picture_url),
-        ).
-        Where(sb.Equal("id", id))
+	// Generate the query and arguments for PostgreSQL
+	query, args := sb.BuildWithFlavor(sqlbuilder.PostgreSQL)
 
-    // Generate the query and arguments for PostgreSQL
-    query, args := sb.BuildWithFlavor(sqlbuilder.PostgreSQL)
+	// Append the RETURNING clause manually
+	query += " RETURNING id, name, nip, phone_number, specialization, status, profile_picture_url"
 
-    // Append the RETURNING clause manually
-    query += " RETURNING id, name, nip, phone_number, specialization, status, profile_picture_url"
+	fmt.Println("Generated Query:", query)
+	fmt.Println("Query Args:", args)
 
-    fmt.Println("Generated Query:", query)
-    fmt.Println("Query Args:", args)
+	// Prepare the result struct
+	var teacher models.Teacher
 
-    // Prepare the result struct
-    var teacher models.Teacher
+	// Execute the query and scan the result into the teacher struct
+	err := config.DB.QueryRow(ctx, query, args...).Scan(
+		&teacher.ID,
+		&teacher.Name,
+		&teacher.NIP,
+		&teacher.Phone_Number,
+		&teacher.Specialization,
+		&teacher.Status,
+		&teacher.Profile_Picture_URL,
+	)
+	if err != nil {
+		return models.Teacher{}, err
+	}
 
-    // Execute the query and scan the result into the teacher struct
-    err := config.DB.QueryRow(ctx, query, args...).Scan(
-        &teacher.ID,
-        &teacher.Name,
-        &teacher.NIP,
-        &teacher.Phone_Number,
-        &teacher.Specialization,
-        &teacher.Status,
-        &teacher.Profile_Picture_URL,
-    )
-    if err != nil {
-        return models.Teacher{}, err
-    }
+	// Return the updated teacher
+	return teacher, nil
+}
 
-    // Return the updated teacher
-    return teacher, nil
+// DeleteTeacher deletes a teacher from the database
+func (r *TeacherRepository) DeleteTeacher(ctx context.Context, id int) error {
+	sb := sqlbuilder.NewDeleteBuilder()
+	sb.DeleteFrom("teachers").Where(sb.Equal("id", id))
+	query, args := sb.BuildWithFlavor(sqlbuilder.PostgreSQL)
+
+	_, err := config.DB.Exec(ctx, query, args...)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

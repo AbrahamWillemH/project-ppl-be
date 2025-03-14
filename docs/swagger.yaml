@@ -12,7 +12,7 @@ definitions:
   models.CreateStudentRequest:
     properties:
       grade:
-        type: string
+        type: integer
       name:
         type: string
       nis:
@@ -50,9 +50,9 @@ definitions:
   models.Student:
     properties:
       curr_score:
-        type: string
+        type: integer
       grade:
-        type: string
+        type: integer
       id:
         type: integer
       name:
@@ -85,6 +85,23 @@ definitions:
       status:
         type: string
       user_id:
+        type: string
+    type: object
+  models.UpdateStudentRequest:
+    properties:
+      curr_score:
+        type: integer
+      grade:
+        type: integer
+      name:
+        type: string
+      nis:
+        type: string
+      phone_number:
+        type: string
+      profile_picture_url:
+        type: string
+      status:
         type: string
     type: object
   models.UpdateTeacherRequest:
@@ -173,6 +190,30 @@ paths:
       tags:
       - HealthCheck
   /api/v1/students:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes a student from the database by ID
+      parameters:
+      - description: Student ID
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete Student
+      tags:
+      - Students
     get:
       consumes:
       - application/json
@@ -183,7 +224,7 @@ paths:
         in: query
         name: page
         type: integer
-      - description: 'Number of items per page (default: 40)'
+      - description: 'Number of items per page (default: 15)'
         in: query
         name: pageSize
         type: integer
@@ -206,6 +247,34 @@ paths:
       security:
       - BearerAuth: []
       summary: Get Students
+      tags:
+      - Students
+    patch:
+      consumes:
+      - application/json
+      description: Updates an existing student in the database
+      parameters:
+      - description: Student ID
+        in: query
+        name: id
+        required: true
+        type: integer
+      - description: Updated Student Data
+        in: body
+        name: teacher
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdateStudentRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Student'
+      security:
+      - BearerAuth: []
+      summary: Update Student
       tags:
       - Students
     post:
@@ -232,6 +301,30 @@ paths:
       tags:
       - Students
   /api/v1/teachers:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes a teacher from the database by ID
+      parameters:
+      - description: Teacher ID
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete Teacher
+      tags:
+      - Teachers
     get:
       consumes:
       - application/json
@@ -242,7 +335,7 @@ paths:
         in: query
         name: page
         type: integer
-      - description: 'Number of items per page (default: 40)'
+      - description: 'Number of items per page (default: 15)'
         in: query
         name: pageSize
         type: integer
@@ -329,7 +422,7 @@ paths:
         in: query
         name: page
         type: integer
-      - description: 'Number of items per page (default: 40)'
+      - description: 'Number of items per page (default: 15)'
         in: query
         name: pageSize
         type: integer
@@ -352,6 +445,34 @@ paths:
       security:
       - BearerAuth: []
       summary: Get Users
+      tags:
+      - Users
+    patch:
+      consumes:
+      - application/json
+      description: Updates an existing user in the database
+      parameters:
+      - description: User ID
+        in: query
+        name: id
+        required: true
+        type: integer
+      - description: Updated User Data
+        in: body
+        name: teacher
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.User'
+      security:
+      - BearerAuth: []
+      summary: Update User
       tags:
       - Users
     post:
@@ -378,7 +499,6 @@ paths:
       tags:
       - Users
 schemes:
-- http
 - https
 securityDefinitions:
   BearerAuth:

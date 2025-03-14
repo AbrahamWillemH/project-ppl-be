@@ -101,3 +101,53 @@ func (r *UserRepository) CreateUser(ctx context.Context, username, email, passwo
 		Role:     role,
 	}, nil
 }
+
+func (r *UserRepository) UpdateUser(
+	ctx context.Context,
+	id int,
+	name string, email string, password string, role string,
+) (models.User, error) {
+	// Hash password
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return models.User{}, err
+	}
+
+	// Build the update query
+	sb := sqlbuilder.NewUpdateBuilder()
+	sb.Update("users").
+		Set(
+			sb.Assign("username", name),
+			sb.Assign("email", email),
+			sb.Assign("password", hashedPassword),
+			sb.Assign("role", role),
+		).
+		Where(sb.Equal("id", id))
+
+	// Generate the query and arguments for PostgreSQL
+	query, args := sb.BuildWithFlavor(sqlbuilder.PostgreSQL)
+
+	// Append the RETURNING clause manually
+	query += " RETURNING id, username, email, password, role "
+
+	fmt.Println("Generated Query:", query)
+	fmt.Println("Query Args:", args)
+
+	// Prepare the result struct
+	var user models.User
+
+	// Execute the query and scan the result into the user struct
+	err = config.DB.QueryRow(ctx, query, args...).Scan(
+		&user.ID,
+		&user.Username,
+		&user.Email,
+		&user.Password,
+		&user.Role,
+	)
+	if err != nil {
+		return models.User{}, err
+	}
+
+	// Return the updated user
+	return user, nil
+}

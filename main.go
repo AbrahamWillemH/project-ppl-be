@@ -1,9 +1,9 @@
 // Package swagger Documentation
 //
 // @title Project PPL API
-// @version 0.1.3
+// @version 0.2.0
 // @description API documentation for Project PPL - Kuda Hitam
-// @schemes http https
+// @schemes https
 //
 // @securityDefinitions.apikey BearerAuth
 // @in header

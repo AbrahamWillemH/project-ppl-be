@@ -21,7 +21,7 @@ var teacherRepo = repo.TeacherRepository{}
 // @Accept  json
 // @Produce json
 // @Param page query int false "Page number (default: 1)"
-// @Param pageSize query int false "Number of items per page (default: 40)"
+// @Param pageSize query int false "Number of items per page (default: 15)"
 // @Param specialization query string false "Filter by specialization (e.g., 'IPA')"
 // @Param sortByNIP query bool false "Sort by NIP (true for ascending, false for descending)"
 // @Success 200 {object} map[string]interface{}
@@ -29,7 +29,7 @@ var teacherRepo = repo.TeacherRepository{}
 func TeachersGetHandler(c *gin.Context) {
 	// Ambil parameter query dari request
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
-	pageSize, _ := strconv.Atoi(c.DefaultQuery("pageSize", "40"))
+	pageSize, _ := strconv.Atoi(c.DefaultQuery("pageSize", "15"))
 	specialization := c.DefaultQuery("specialization", "")
 	sortByNIP, _ := strconv.ParseBool(c.DefaultQuery("sortByNIP", "false"))
 
@@ -37,7 +37,7 @@ func TeachersGetHandler(c *gin.Context) {
 		page = 1
 	}
 	if pageSize < 1 {
-		pageSize = 40
+		pageSize = 15
 	}
 
 	// Ambil data dengan pagination dan filter specialization
@@ -134,10 +134,10 @@ func TeachersUpdateHandler(c *gin.Context) {
 		id,
 		req.Name,
 		req.NIP,
-		phoneNumber,         // Pass the dereferenced phone number
+		phoneNumber, // Pass the dereferenced phone number
 		req.Specialization,
 		req.Status,
-		profilePictureURL,   // Pass the dereferenced profile picture URL
+		profilePictureURL, // Pass the dereferenced profile picture URL
 	)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -146,4 +146,34 @@ func TeachersUpdateHandler(c *gin.Context) {
 
 	// Respond with the updated teacher
 	c.JSON(http.StatusOK, teacher)
+}
+
+// TeachersDeleteHandler deletes a teacher
+// @Summary Delete Teacher
+// @Description Deletes a teacher from the database by ID
+// @Tags Teachers
+// @Security BearerAuth
+// @Accept  json
+// @Produce  json
+// @Param id query int true "Teacher ID"
+// @Success 200 {object} map[string]string
+// @Router /api/v1/teachers [delete]
+func TeachersDeleteHandler(c *gin.Context) {
+	// Extract `id` from query parameters
+	idStr := c.Query("id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil || id <= 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid or missing teacher ID"})
+		return
+	}
+
+	// Call DeleteTeacher function from repository
+	err = teacherRepo.DeleteTeacher(context.Background(), id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Respond with success message
+	c.JSON(http.StatusOK, gin.H{"message": "Teacher deleted successfully"})
 }

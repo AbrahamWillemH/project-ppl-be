@@ -120,7 +120,7 @@ const docTemplate = `{
                     },
                     {
                         "type": "integer",
-                        "description": "Number of items per page (default: 40)",
+                        "description": "Number of items per page (default: 15)",
                         "name": "pageSize",
                         "in": "query"
                     },
@@ -183,6 +183,88 @@ const docTemplate = `{
                         }
                     }
                 }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Deletes a student from the database by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Students"
+                ],
+                "summary": "Delete Student",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Student ID",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Updates an existing student in the database",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Students"
+                ],
+                "summary": "Update Student",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Student ID",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "description": "Updated Student Data",
+                        "name": "teacher",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.UpdateStudentRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Student"
+                        }
+                    }
+                }
             }
         },
         "/api/v1/teachers": {
@@ -212,7 +294,7 @@ const docTemplate = `{
                     },
                     {
                         "type": "integer",
-                        "description": "Number of items per page (default: 40)",
+                        "description": "Number of items per page (default: 15)",
                         "name": "pageSize",
                         "in": "query"
                     },
@@ -272,6 +354,44 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/models.Teacher"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Deletes a teacher from the database by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Teachers"
+                ],
+                "summary": "Delete Teacher",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Teacher ID",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
                         }
                     }
                 }
@@ -348,7 +468,7 @@ const docTemplate = `{
                     },
                     {
                         "type": "integer",
-                        "description": "Number of items per page (default: 40)",
+                        "description": "Number of items per page (default: 15)",
                         "name": "pageSize",
                         "in": "query"
                     },
@@ -411,6 +531,50 @@ const docTemplate = `{
                         }
                     }
                 }
+            },
+            "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Updates an existing user in the database",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Update User",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "User ID",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "description": "Updated User Data",
+                        "name": "teacher",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.CreateUserRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.User"
+                        }
+                    }
+                }
             }
         }
     },
@@ -434,7 +598,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "grade": {
-                    "type": "string"
+                    "type": "integer"
                 },
                 "name": {
                     "type": "string"
@@ -491,10 +655,10 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "curr_score": {
-                    "type": "string"
+                    "type": "integer"
                 },
                 "grade": {
-                    "type": "string"
+                    "type": "integer"
                 },
                 "id": {
                     "type": "integer"
@@ -544,6 +708,32 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "user_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.UpdateStudentRequest": {
+            "type": "object",
+            "properties": {
+                "curr_score": {
+                    "type": "integer"
+                },
+                "grade": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "nis": {
+                    "type": "string"
+                },
+                "phone_number": {
+                    "type": "string"
+                },
+                "profile_picture_url": {
+                    "type": "string"
+                },
+                "status": {
                     "type": "string"
                 }
             }
@@ -607,7 +797,7 @@ var SwaggerInfo = &swag.Spec{
 	Version:          "0.1.3",
 	Host:             "",
 	BasePath:         "",
-	Schemes:          []string{"http", "https"},
+	Schemes:          []string{"https"},
 	Title:            "Project PPL API",
 	Description:      "API documentation for Project PPL - Kuda Hitam",
 	InfoInstanceName: "swagger",
