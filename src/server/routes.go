@@ -31,14 +31,14 @@ func SetupRouter() *gin.Engine {
 
 		// Users group
 		usersGroup := v1Group.Group("/users")
-		usersGroup.Use(middleware.AuthMiddleware()) // Pasang middleware di sini
+		usersGroup.Use(middleware.AuthMiddleware())
 		usersGroup.GET("", users.UserGetHandler)
 		usersGroup.POST("", users.UserPostHandler)
 		usersGroup.PATCH("", users.UserUpdateHandler)
 
 		// Students group
 		studentsGroup := v1Group.Group("/students")
-		studentsGroup.Use(middleware.AuthMiddleware()) // Pasang middleware di sini
+		studentsGroup.Use(middleware.AuthMiddleware())
 		studentsGroup.GET("", students.StudentsGetHandler)
 		studentsGroup.POST("", students.StudentPostHandler)
 		studentsGroup.PATCH("", students.StudentUpdateHandler)
@@ -46,11 +46,15 @@ func SetupRouter() *gin.Engine {
 
 		// Teachers group
 		teachersGroup := v1Group.Group("/teachers")
-		teachersGroup.Use(middleware.AuthMiddleware()) // Pasang middleware di sini
+		teachersGroup.Use(middleware.AuthMiddleware())
 		teachersGroup.GET("", teachers.TeachersGetHandler)
 		teachersGroup.POST("", teachers.TeachersPostHandler)
 		teachersGroup.PATCH("", teachers.TeachersUpdateHandler)
 		teachersGroup.DELETE("", teachers.TeachersDeleteHandler)
+
+		// Materials group
+		materialsGroup := v1Group.Group("/materials")
+		materialsGroup.Use(middleware.AuthMiddleware())
 	}
 
 	fmt.Println("Server is running at http://localhost:8080")
