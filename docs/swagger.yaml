@@ -9,6 +9,26 @@ definitions:
     - password
     - username
     type: object
+  models.Class:
+    properties:
+      description:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      teacher_id:
+        type: integer
+    type: object
+  models.CreateClassRequest:
+    properties:
+      description:
+        type: string
+      name:
+        type: string
+      teacher_id:
+        type: integer
+    type: object
   models.CreateMaterialRequest:
     properties:
       class_id:
@@ -162,6 +182,8 @@ definitions:
     type: object
   models.User:
     properties:
+      display_name:
+        type: string
       email:
         type: string
       id:
@@ -215,6 +237,108 @@ paths:
       summary: Login authentication
       tags:
       - Auth
+  /api/v1/classes:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes a class from the database by ID
+      parameters:
+      - description: Class ID
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete Class
+      tags:
+      - Classes
+    get:
+      consumes:
+      - application/json
+      description: Fetch all classes from the database with pagination
+      parameters:
+      - description: 'Page number (default: 1)'
+        in: query
+        name: page
+        type: integer
+      - description: 'Number of items per page (default: 15)'
+        in: query
+        name: pageSize
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get Class
+      tags:
+      - Classes
+    patch:
+      consumes:
+      - application/json
+      description: Updates an existing class in the database
+      parameters:
+      - description: Class ID
+        in: query
+        name: id
+        required: true
+        type: integer
+      - description: Updated Class Data
+        in: body
+        name: class
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateClassRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Class'
+      security:
+      - BearerAuth: []
+      summary: Update Class
+      tags:
+      - Classes
+    post:
+      consumes:
+      - application/json
+      description: Create a new class in the database
+      parameters:
+      - description: Class data
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateClassRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Class'
+      security:
+      - BearerAuth: []
+      summary: Create Class
+      tags:
+      - Classes
   /api/v1/materials:
     delete:
       consumes:

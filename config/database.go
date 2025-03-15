@@ -12,7 +12,7 @@ import (
 
 var DB *pgx.Conn
 
-func ConnectDB() {
+func ConnectDB() *pgx.Conn {
 	// Load environment variables
 	err := godotenv.Load()
 	if err != nil {
@@ -35,6 +35,8 @@ func ConnectDB() {
 	DB = conn
 
 	fmt.Println("Table check completed.")
+
+	return conn
 }
 
 // CloseDB closes the database connection

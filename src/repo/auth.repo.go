@@ -5,10 +5,9 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"time"
-
 	"project-ppl-be/config"
 	"project-ppl-be/src/models"
+	"time"
 
 	"github.com/golang-jwt/jwt"
 	"github.com/huandu/go-sqlbuilder"
@@ -21,7 +20,7 @@ type AuthRepository struct{}
 // LoginUser finds a user by email and verifies password
 func (r *AuthRepository) LoginUser(ctx context.Context, username, password string) (string, error) {
 	sb := sqlbuilder.NewSelectBuilder()
-	sb.Select("id", "username", "email", "password", "role").From("users")
+	sb.Select("id", "username", "email", "password", "role", "display_name").From("users")
 	sb.Where(sb.Equal("username", username))
 
 	query, args := sb.BuildWithFlavor(sqlbuilder.PostgreSQL)
@@ -30,7 +29,7 @@ func (r *AuthRepository) LoginUser(ctx context.Context, username, password strin
 	row := config.DB.QueryRow(ctx, query, args...)
 
 	var user models.User
-	err := row.Scan(&user.ID, &user.Username, &user.Email, &user.Password, &user.Role)
+	err := row.Scan(&user.ID, &user.Username, &user.Email, &user.Password, &user.Role, &user.Display_Name)
 	if err != nil {
 		fmt.Println("User not found error:", err) // Debugging log
 		return "", errors.New("user not found")
@@ -60,10 +59,11 @@ func generateJWT(user models.User) (string, error) {
 	}
 
 	claims := jwt.MapClaims{
-		"user_id": user.ID,
-		"email":   user.Email,
-		"role":    user.Role,
-		"exp":     time.Now().Add(time.Hour * 24).Unix(), // Expire dalam 24 jam
+		"user_id":      user.ID,
+		"email":        user.Email,
+		"role":         user.Role,
+		"exp":          time.Now().Add(time.Hour * 24).Unix(), // Expire dalam 24 jam
+		"display_name": user.Display_Name,
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)

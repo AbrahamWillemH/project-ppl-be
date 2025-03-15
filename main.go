@@ -23,11 +23,11 @@ import (
 
 func main() {
 	// Initialize the database
-	config.ConnectDB()
+	db := config.ConnectDB()
 	defer config.CloseDB()
 
-	// Set up the Gin router
-	router := server.SetupRouter()
+	// Set up the Gin router with db
+	router := server.SetupRouter(db)
 
 	// Create a CORS wrapper with default settings
 	corsHandler := cors.AllowAll()
