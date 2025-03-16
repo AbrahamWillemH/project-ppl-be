@@ -1,0 +1,3 @@
+ALTER TABLE exams
+ADD COLUMN start_time TIMESTAMP,
+ADD COLUMN end_time TIMESTAMP;

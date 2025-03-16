@@ -6,7 +6,7 @@ type Material struct {
 	Class_ID    int    `json:"class_id" db:"class_id"`
 	Title       string `json:"title" db:"title"`
 	Description string `json:"description" db:"description"`
-	Content     int    `json:"content" db:"content"`
+	Content     string `json:"content" db:"content"`
 	Teacher_ID  int    `json:"teacher_id" db:"teacher_id"`
 }
 
@@ -15,7 +15,7 @@ type CreateMaterialRequest struct {
 	Class_ID    int    `json:"class_id" db:"class_id"`
 	Title       string `json:"title" db:"title"`
 	Description string `json:"description" db:"description"`
-	Content     int    `json:"content" db:"content"`
+	Content     string `json:"content" db:"content"`
 	Teacher_ID  int    `json:"teacher_id" db:"teacher_id"`
 }
 
@@ -23,6 +23,6 @@ type UpdateMaterialRequest struct {
 	Class_ID    int    `json:"class_id" db:"class_id"`
 	Title       string `json:"title" db:"title"`
 	Description string `json:"description" db:"description"`
-	Content     int    `json:"content" db:"content"`
+	Content     string `json:"content" db:"content"`
 	Teacher_ID  int    `json:"teacher_id" db:"teacher_id"`
 }

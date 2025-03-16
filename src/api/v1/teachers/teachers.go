@@ -24,6 +24,7 @@ var teacherRepo = repo.TeacherRepository{}
 // @Param pageSize query int false "Number of items per page (default: 15)"
 // @Param specialization query string false "Filter by specialization (e.g., 'IPA')"
 // @Param sortByNIP query bool false "Sort by NIP (true for ascending, false for descending)"
+// @Param search query string false "Search by Name or NIP"
 // @Success 200 {object} map[string]interface{}
 // @Router /api/v1/teachers [get]
 func TeachersGetHandler(c *gin.Context) {
@@ -32,6 +33,7 @@ func TeachersGetHandler(c *gin.Context) {
 	pageSize, _ := strconv.Atoi(c.DefaultQuery("pageSize", "15"))
 	specialization := c.DefaultQuery("specialization", "")
 	sortByNIP, _ := strconv.ParseBool(c.DefaultQuery("sortByNIP", "false"))
+	search := c.DefaultQuery("search", "")
 
 	if page < 1 {
 		page = 1
@@ -41,7 +43,7 @@ func TeachersGetHandler(c *gin.Context) {
 	}
 
 	// Ambil data dengan pagination dan filter specialization
-	students, total, err := teacherRepo.GetAllTeachers(context.Background(), page, pageSize, specialization, sortByNIP)
+	students, total, err := teacherRepo.GetAllTeachers(context.Background(), page, pageSize, specialization, sortByNIP, search)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

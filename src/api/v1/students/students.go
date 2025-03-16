@@ -1,4 +1,4 @@
-package users
+package students
 
 import (
 	"context"
@@ -24,6 +24,7 @@ var studentRepo = repo.StudentRepository{}
 // @Param pageSize query int false "Number of items per page (default: 15)"
 // @Param grade query string false "Filter by grade (e.g., '10')"
 // @Param sortByNIS query bool false "Sort by NIS (true for ascending, false for descending)"
+// @Param search query string false "Search by Name or NIS"
 // @Success 200 {object} map[string]interface{}
 // @Router /api/v1/students [get]
 func StudentsGetHandler(c *gin.Context) {
@@ -32,6 +33,7 @@ func StudentsGetHandler(c *gin.Context) {
 	pageSize, _ := strconv.Atoi(c.DefaultQuery("pageSize", "15"))
 	grade := c.DefaultQuery("grade", "")
 	sortByNIS, _ := strconv.ParseBool(c.DefaultQuery("sortByNIS", "false"))
+	search := c.DefaultQuery("search", "")
 
 	if page < 1 {
 		page = 1
@@ -41,7 +43,7 @@ func StudentsGetHandler(c *gin.Context) {
 	}
 
 	// Ambil data dengan pagination dan filter grade
-	students, total, err := studentRepo.GetAllStudents(context.Background(), page, pageSize, grade, sortByNIS)
+	students, total, err := studentRepo.GetAllStudents(context.Background(), page, pageSize, grade, sortByNIS, search)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

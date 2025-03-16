@@ -34,7 +34,7 @@ definitions:
       class_id:
         type: integer
       content:
-        type: integer
+        type: string
       description:
         type: string
       teacher_id:
@@ -85,7 +85,7 @@ definitions:
       class_id:
         type: integer
       content:
-        type: integer
+        type: string
       description:
         type: string
       id:
@@ -94,6 +94,14 @@ definitions:
         type: integer
       title:
         type: string
+    type: object
+  models.MigrateStudentGradeRequest:
+    properties:
+      migrate:
+        default: up
+        type: string
+    required:
+    - migrate
     type: object
   models.Student:
     properties:
@@ -140,7 +148,7 @@ definitions:
       class_id:
         type: integer
       content:
-        type: integer
+        type: string
       description:
         type: string
       teacher_id:
@@ -503,6 +511,10 @@ paths:
         in: query
         name: sortByNIS
         type: boolean
+      - description: Search by Name or NIS
+        in: query
+        name: search
+        type: string
       produces:
       - application/json
       responses:
@@ -567,6 +579,30 @@ paths:
       summary: Create Student
       tags:
       - Students
+  /api/v1/students/grade-migrate:
+    post:
+      consumes:
+      - application/json
+      description: Create a new student in the database
+      parameters:
+      - description: Student grade
+        in: body
+        name: student
+        required: true
+        schema:
+          $ref: '#/definitions/models.MigrateStudentGradeRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Student'
+      security:
+      - BearerAuth: []
+      summary: Migrates Student Grades by 1.
+      tags:
+      - Students
   /api/v1/teachers:
     delete:
       consumes:
@@ -614,6 +650,10 @@ paths:
         in: query
         name: sortByNIP
         type: boolean
+      - description: Search by Name or NIP
+        in: query
+        name: search
+        type: string
       produces:
       - application/json
       responses:

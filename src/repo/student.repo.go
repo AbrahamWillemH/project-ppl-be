@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"project-ppl-be/config"
 	"project-ppl-be/src/models"
+	"strings"
 
 	"github.com/huandu/go-sqlbuilder"
 )
@@ -13,7 +14,7 @@ import (
 type StudentRepository struct{}
 
 // GetAllStudents retrieves all students from the database
-func (r *StudentRepository) GetAllStudents(ctx context.Context, page, pageSize int, grade string, sortByNIS bool) ([]models.Student, int, error) {
+func (r *StudentRepository) GetAllStudents(ctx context.Context, page, pageSize int, grade string, sortByNIS bool, search string) ([]models.Student, int, error) {
 	sb := sqlbuilder.NewSelectBuilder()
 	sb.Select("id", "name", "nis", "phone_number", "grade", "curr_score", "status", "profile_picture_url", "user_id").
 		From("students").
@@ -30,6 +31,14 @@ func (r *StudentRepository) GetAllStudents(ctx context.Context, page, pageSize i
 		sb.OrderBy("nis ASC")
 	} else {
 		sb.OrderBy("nis DESC")
+	}
+
+	if search != "" {
+		lowerSearch := strings.ToLower(search) // Ubah input menjadi lowercase
+		sb.Where(sb.Or(
+			sb.Like("LOWER(name)", "%"+lowerSearch+"%"),
+			sb.Like("LOWER(nis)", "%"+lowerSearch+"%"),
+		))
 	}
 
 	query, args := sb.BuildWithFlavor(sqlbuilder.PostgreSQL)
@@ -153,6 +162,30 @@ func (r *StudentRepository) DeleteStudent(ctx context.Context, id int) error {
 	sb := sqlbuilder.NewDeleteBuilder()
 	sb.DeleteFrom("students").Where(sb.Equal("id", id))
 	query, args := sb.BuildWithFlavor(sqlbuilder.PostgreSQL)
+
+	_, err := config.DB.Exec(ctx, query, args...)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// MigrateStudentGrade inserts a new student into the database
+func (r *StudentRepository) MigrateStudentGrade(ctx context.Context, migrate string) error {
+	ub := sqlbuilder.NewUpdateBuilder()
+	ub.Update("students")
+
+	switch migrate {
+	case "up":
+		ub.Set("grade = grade + 1")
+	case "down":
+		ub.Set("grade = grade - 1")
+	default:
+		return fmt.Errorf("invalid migration type: %s", migrate)
+	}
+
+	query, args := ub.BuildWithFlavor(sqlbuilder.PostgreSQL)
 
 	_, err := config.DB.Exec(ctx, query, args...)
 	if err != nil {

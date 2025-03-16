@@ -48,6 +48,7 @@ func SetupRouter(db *pgx.Conn) *gin.Engine {
 		studentsGroup.POST("", students.StudentPostHandler)
 		studentsGroup.PATCH("", students.StudentUpdateHandler)
 		studentsGroup.DELETE("", students.StudentDeleteHandler)
+		studentsGroup.POST("grade-migrate", students.StudentGradeMigrateHandler)
 
 		teachersGroup := v1Group.Group("/teachers")
 		teachersGroup.Use(middleware.AuthMiddleware(), middleware.AdminMiddleware())

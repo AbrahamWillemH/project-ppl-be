@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"project-ppl-be/config"
 	"project-ppl-be/src/models"
+	"strings"
 
 	"github.com/huandu/go-sqlbuilder"
 )
@@ -13,7 +14,7 @@ import (
 type TeacherRepository struct{}
 
 // GetAllTeachers retrieves all teachers from the database
-func (r *TeacherRepository) GetAllTeachers(ctx context.Context, page, pageSize int, specialization string, sortByNIP bool) ([]models.Teacher, int, error) {
+func (r *TeacherRepository) GetAllTeachers(ctx context.Context, page, pageSize int, specialization string, sortByNIP bool, search string) ([]models.Teacher, int, error) {
 	sb := sqlbuilder.NewSelectBuilder()
 	sb.Select("id", "name", "nip", "phone_number", "specialization", "status", "profile_picture_url", "user_id").
 		From("teachers").
@@ -30,6 +31,14 @@ func (r *TeacherRepository) GetAllTeachers(ctx context.Context, page, pageSize i
 		sb.OrderBy("nip ASC")
 	} else {
 		sb.OrderBy("nip DESC")
+	}
+
+	if search != "" {
+		lowerSearch := strings.ToLower(search) // Ubah input menjadi lowercase
+		sb.Where(sb.Or(
+			sb.Like("LOWER(name)", "%"+lowerSearch+"%"),
+			sb.Like("LOWER(nip)", "%"+lowerSearch+"%"),
+		))
 	}
 
 	query, args := sb.BuildWithFlavor(sqlbuilder.PostgreSQL)

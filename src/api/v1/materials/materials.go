@@ -113,7 +113,7 @@ func MaterialsUpdateHandler(c *gin.Context) {
 		return
 	}
 
-	// Call UpdateTeacher with the correct parameters
+	// Call UpdateMaterial with the correct parameters
 	material, err := materialsRepo.UpdateMaterial(
 		context.Background(),
 		id,

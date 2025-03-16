@@ -459,6 +459,12 @@ const docTemplate = `{
                         "description": "Sort by NIS (true for ascending, false for descending)",
                         "name": "sortByNIS",
                         "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Search by Name or NIS",
+                        "name": "search",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -591,6 +597,45 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/students/grade-migrate": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Create a new student in the database",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Students"
+                ],
+                "summary": "Migrates Student Grades by 1.",
+                "parameters": [
+                    {
+                        "description": "Student grade",
+                        "name": "student",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.MigrateStudentGradeRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Student"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/teachers": {
             "get": {
                 "security": [
@@ -632,6 +677,12 @@ const docTemplate = `{
                         "type": "boolean",
                         "description": "Sort by NIP (true for ascending, false for descending)",
                         "name": "sortByNIP",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Search by Name or NIP",
+                        "name": "search",
                         "in": "query"
                     }
                 ],
@@ -956,7 +1007,7 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "content": {
-                    "type": "integer"
+                    "type": "string"
                 },
                 "description": {
                     "type": "string"
@@ -1033,7 +1084,7 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "content": {
-                    "type": "integer"
+                    "type": "string"
                 },
                 "description": {
                     "type": "string"
@@ -1046,6 +1097,18 @@ const docTemplate = `{
                 },
                 "title": {
                     "type": "string"
+                }
+            }
+        },
+        "models.MigrateStudentGradeRequest": {
+            "type": "object",
+            "required": [
+                "migrate"
+            ],
+            "properties": {
+                "migrate": {
+                    "type": "string",
+                    "default": "up"
                 }
             }
         },
@@ -1117,7 +1180,7 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "content": {
-                    "type": "integer"
+                    "type": "string"
                 },
                 "description": {
                     "type": "string"

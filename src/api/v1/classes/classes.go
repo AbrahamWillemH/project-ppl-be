@@ -93,7 +93,7 @@ func ClassPostHandler(c *gin.Context) {
 // @Accept  json
 // @Produce  json
 // @Param id query int true "Class ID"
-// @Param class body models.Create true "Updated Class Data"
+// @Param class body models.CreateClassRequest true "Updated Class Data"
 // @Success 200 {object} models.Class
 // @Router /api/v1/classes [patch]
 func ClassUpdateHandler(c *gin.Context) {

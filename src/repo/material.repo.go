@@ -51,7 +51,7 @@ func (r *MaterialRepository) GetAllMaterials(ctx context.Context, page, pageSize
 }
 
 // CreateStudent inserts a new material into the database
-func (r *MaterialRepository) CreateMaterial(ctx context.Context, class_id int, title string, description string, content int, teacher_id int) (models.Material, error) {
+func (r *MaterialRepository) CreateMaterial(ctx context.Context, class_id int, title string, description string, content string, teacher_id int) (models.Material, error) {
 	sb := sqlbuilder.NewInsertBuilder()
 	sb.InsertInto("materials").
 		Cols("class_id", "title", "description", "content", "teacher_id").
@@ -82,7 +82,7 @@ func (r *MaterialRepository) CreateMaterial(ctx context.Context, class_id int, t
 }
 
 // UpdateStudent update an existing material
-func (r *MaterialRepository) UpdateMaterial(ctx context.Context, id int, class_id int, title string, description string, content int, teacher_id int) (models.Material, error) {
+func (r *MaterialRepository) UpdateMaterial(ctx context.Context, id int, class_id int, title string, description string, content string, teacher_id int) (models.Material, error) {
 	// Build the update query without Returning method
 	sb := sqlbuilder.NewUpdateBuilder()
 	sb.Update("materials").

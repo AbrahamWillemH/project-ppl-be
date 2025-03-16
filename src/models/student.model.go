@@ -30,3 +30,8 @@ type UpdateStudentRequest struct {
 	Current_Score       *int    `json:"curr_score" db:"curr_score"`
 	Profile_Picture_URL *string `json:"profile_picture_url" db:"profile_picture_url"`
 }
+
+// For migrating all student grades by 1.
+type MigrateStudentGradeRequest struct {
+	Migrate string `json:"migrate" binding:"required" default:"up"`
+}
