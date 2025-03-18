@@ -207,7 +207,7 @@ info:
   contact: {}
   description: API documentation for Project PPL - Kuda Hitam
   title: Project PPL API
-  version: 0.2.0
+  version: 0.2.1
 paths:
   /api/v1/auth:
     post:
@@ -583,7 +583,7 @@ paths:
     post:
       consumes:
       - application/json
-      description: Create a new student in the database
+      description: Accepts "up" to increase grade, and "down" to decrease grade
       parameters:
       - description: Student grade
         in: body

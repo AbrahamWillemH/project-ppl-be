@@ -12,19 +12,12 @@ import (
 	users "project-ppl-be/src/api/v1/users"
 
 	"github.com/gin-gonic/gin"
-	"github.com/jackc/pgx/v5"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
-func SetupRouter(db *pgx.Conn) *gin.Engine {
+func SetupRouter() *gin.Engine {
 	router := gin.Default()
-
-	// Middleware untuk menyimpan db di gin.Context
-	router.Use(func(c *gin.Context) {
-		c.Set("db", db)
-		c.Next()
-	})
 
 	// Swagger documentation route
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))

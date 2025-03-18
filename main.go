@@ -1,7 +1,7 @@
 // Package swagger Documentation
 //
 // @title Project PPL API
-// @version 0.2.0
+// @version 0.2.1
 // @description API documentation for Project PPL - Kuda Hitam
 // @schemes https
 //
@@ -23,11 +23,11 @@ import (
 
 func main() {
 	// Initialize the database
-	db := config.ConnectDB()
+	config.ConnectDB()
 	defer config.CloseDB()
 
 	// Set up the Gin router with db
-	router := server.SetupRouter(db)
+	router := server.SetupRouter()
 
 	// Create a CORS wrapper with default settings
 	corsHandler := cors.AllowAll()

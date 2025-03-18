@@ -604,7 +604,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Create a new student in the database",
+                "description": "Accepts \"up\" to increase grade, and \"down\" to decrease grade",
                 "consumes": [
                     "application/json"
                 ],
@@ -1278,7 +1278,7 @@ const docTemplate = `{
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "0.2.0",
+	Version:          "0.2.1",
 	Host:             "",
 	BasePath:         "",
 	Schemes:          []string{"https"},

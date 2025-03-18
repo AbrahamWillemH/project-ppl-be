@@ -6,13 +6,13 @@ import (
 	"log"
 	"os"
 
-	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/joho/godotenv"
 )
 
-var DB *pgx.Conn
+var DB *pgxpool.Pool
 
-func ConnectDB() *pgx.Conn {
+func ConnectDB() {
 	// Load environment variables
 	err := godotenv.Load()
 	if err != nil {
@@ -25,24 +25,20 @@ func ConnectDB() *pgx.Conn {
 		log.Fatal("DATABASE_URL is not set in .env file or environment variables.")
 	}
 
-	// Connect to Neon PostgreSQL DB
-	conn, err := pgx.Connect(context.Background(), connStr)
+	// Use a connection pool instead of a single connection
+	pool, err := pgxpool.New(context.Background(), connStr)
 	if err != nil {
-		log.Fatalf("Failed to connect to PostgreSQL NeonDB: %v", err)
+		log.Fatalf("Failed to connect to PostgreSQL: %v", err)
 	}
 
-	fmt.Println("Connected to PostgreSQL NeonDB!")
-	DB = conn
-
-	fmt.Println("Table check completed.")
-
-	return conn
+	fmt.Println("Connected to PostgreSQL using connection pool!")
+	DB = pool
 }
 
-// CloseDB closes the database connection
+// CloseDB closes the database connection pool
 func CloseDB() {
 	if DB != nil {
-		DB.Close(context.Background())
+		DB.Close()
 		fmt.Println("Database connection closed.")
 	}
 }

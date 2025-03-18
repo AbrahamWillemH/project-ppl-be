@@ -15,10 +15,11 @@ type ClassRepository struct{}
 // GettAllClasses retrieves all classes from the database
 func (r *ClassRepository) GettAllClasses(ctx context.Context, page, pageSize int) ([]models.Class, int, error) {
 	sb := sqlbuilder.NewSelectBuilder()
-	sb.Select("id", "name", "description", "teacher_id").
+	sb.Select("classes.id", "classes.name", "classes.description", "classes.teacher_id", "teachers.name AS teacher_name").
 		From("classes").
+		Join("teachers", "classes.teacher_id = teachers.id").
 		Limit(pageSize).
-		Offset((page - 1) * pageSize) // OFFSET = (page - 1) * pageSize
+		Offset((page - 1) * pageSize)
 
 	query, args := sb.BuildWithFlavor(sqlbuilder.PostgreSQL)
 	rows, err := config.DB.Query(ctx, query, args...)
@@ -30,18 +31,18 @@ func (r *ClassRepository) GettAllClasses(ctx context.Context, page, pageSize int
 	var classes []models.Class
 	for rows.Next() {
 		var class models.Class
-		err := rows.Scan(&class.ID, &class.Name, &class.Description, &class.Teacher_ID)
-		if err != nil {
+		if err := rows.Scan(&class.ID, &class.Name, &class.Description, &class.Teacher_ID, &class.Teacher_Name); err != nil {
 			return nil, 0, err
 		}
 		classes = append(classes, class)
 	}
 
-	// Hitung total jumlah data untuk pagination
+	if err := rows.Err(); err != nil {
+		return nil, 0, err
+	}
+
 	countQuery := "SELECT COUNT(*) FROM classes"
-
 	var total int
-
 	err = config.DB.QueryRow(ctx, countQuery).Scan(&total)
 	if err != nil {
 		return nil, 0, err
@@ -58,7 +59,6 @@ func (r *ClassRepository) CreateClass(ctx context.Context, name string, descript
 		Values(name, description, teacher_id).
 		Returning("id")
 
-	// Convert to PostgreSQL-style placeholders ($1, $2, ...)
 	query, args := sb.BuildWithFlavor(sqlbuilder.PostgreSQL)
 
 	fmt.Println("Generated Query:", query)
@@ -70,7 +70,6 @@ func (r *ClassRepository) CreateClass(ctx context.Context, name string, descript
 		return models.Class{}, err
 	}
 
-	// Return the created class
 	return models.Class{
 		ID:          classID,
 		Name:        name,
@@ -79,9 +78,8 @@ func (r *ClassRepository) CreateClass(ctx context.Context, name string, descript
 	}, nil
 }
 
-// UpdateClass update an existing class
+// UpdateClass updates an existing class
 func (r *ClassRepository) UpdateClass(ctx context.Context, id int, name string, description string, teacher_id int) (models.Class, error) {
-	// Build the update query without Returning method
 	sb := sqlbuilder.NewUpdateBuilder()
 	sb.Update("classes").
 		Set(
@@ -91,19 +89,13 @@ func (r *ClassRepository) UpdateClass(ctx context.Context, id int, name string, 
 		).
 		Where(sb.Equal("id", id))
 
-	// Generate the query and arguments for PostgreSQL
 	query, args := sb.BuildWithFlavor(sqlbuilder.PostgreSQL)
-
-	// Append the RETURNING clause manually
 	query += " RETURNING id, name, description, teacher_id"
 
 	fmt.Println("Generated Query:", query)
 	fmt.Println("Query Args:", args)
 
-	// Prepare the result struct
 	var class models.Class
-
-	// Execute the query and scan the result into the class struct
 	err := config.DB.QueryRow(ctx, query, args...).Scan(
 		&class.ID,
 		&class.Name,
@@ -114,7 +106,6 @@ func (r *ClassRepository) UpdateClass(ctx context.Context, id int, name string, 
 		return models.Class{}, err
 	}
 
-	// Return the updated class
 	return class, nil
 }
 
@@ -125,9 +116,5 @@ func (r *ClassRepository) DeleteClass(ctx context.Context, id int) error {
 	query, args := sb.BuildWithFlavor(sqlbuilder.PostgreSQL)
 
 	_, err := config.DB.Exec(ctx, query, args...)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return err
 }
