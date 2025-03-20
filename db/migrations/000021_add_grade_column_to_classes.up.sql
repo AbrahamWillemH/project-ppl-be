@@ -1,0 +1,2 @@
+ALTER TABLE classes
+ADD COLUMN grade INT;

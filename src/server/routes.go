@@ -29,12 +29,14 @@ func SetupRouter() *gin.Engine {
 
 		v1Group.POST("/auth", auth.AuthHandler)
 
+		// USERS
 		usersGroup := v1Group.Group("/users")
 		usersGroup.Use(middleware.AuthMiddleware(), middleware.AdminMiddleware())
 		usersGroup.GET("", users.UserGetHandler)
 		usersGroup.POST("", users.UserPostHandler)
 		usersGroup.PATCH("", users.UserUpdateHandler)
 
+		// STUDENTS
 		studentsGroup := v1Group.Group("/students")
 		studentsGroup.Use(middleware.AuthMiddleware(), middleware.AdminMiddleware())
 		studentsGroup.GET("", students.StudentsGetHandler)
@@ -43,6 +45,7 @@ func SetupRouter() *gin.Engine {
 		studentsGroup.DELETE("", students.StudentDeleteHandler)
 		studentsGroup.POST("grade-migrate", students.StudentGradeMigrateHandler)
 
+		// TEACHERS
 		teachersGroup := v1Group.Group("/teachers")
 		teachersGroup.Use(middleware.AuthMiddleware(), middleware.AdminMiddleware())
 		teachersGroup.GET("", teachers.TeachersGetHandler)
@@ -50,13 +53,18 @@ func SetupRouter() *gin.Engine {
 		teachersGroup.PATCH("", teachers.TeachersUpdateHandler)
 		teachersGroup.DELETE("", teachers.TeachersDeleteHandler)
 
+		// CLASSES
 		classesGroup := v1Group.Group("/classes")
 		classesGroup.Use(middleware.AuthMiddleware(), middleware.AdminMiddleware())
 		classesGroup.GET("", classes.ClassGetHandler)
+		classesGroup.GET("/details", classes.ClassGetByIdHandler)
+		classesGroup.POST("/assign-students", classes.ClassAssignStudentsHandler)
+		classesGroup.DELETE("/unassign-students", classes.ClassUnassignStudentsHandler)
 		classesGroup.POST("", classes.ClassPostHandler)
 		classesGroup.PATCH("", classes.ClassUpdateHandler)
 		classesGroup.DELETE("", classes.ClassDeleteHandler)
 
+		// MATERIALS
 		materialsGroup := v1Group.Group("/materials")
 		materialsGroup.Use(middleware.AuthMiddleware(), middleware.TeacherMiddleware())
 		materialsGroup.GET("", materials.MaterialsGetHandler)
@@ -64,6 +72,7 @@ func SetupRouter() *gin.Engine {
 		materialsGroup.PATCH("", materials.MaterialsUpdateHandler)
 		materialsGroup.DELETE("", materials.MaterialsDeleteHandler)
 
+		// EXERCISES
 		exercisesGroup := v1Group.Group("/exercises")
 		exercisesGroup.Use(middleware.AuthMiddleware(), middleware.TeacherMiddleware())
 		exercisesGroup.GET("", materials.MaterialsGetHandler)

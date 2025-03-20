@@ -13,17 +13,32 @@ definitions:
     properties:
       description:
         type: string
+      grade:
+        type: integer
       id:
         type: integer
       name:
         type: string
       teacher_id:
         type: integer
+      teacher_name:
+        type: string
+    type: object
+  models.ClassAssignStudents:
+    properties:
+      id:
+        type: integer
+      student_id:
+        items:
+          type: integer
+        type: array
     type: object
   models.CreateClassRequest:
     properties:
       description:
         type: string
+      grade:
+        type: integer
       name:
         type: string
       teacher_id:
@@ -345,6 +360,164 @@ paths:
       security:
       - BearerAuth: []
       summary: Create Class
+      tags:
+      - Classes
+  /api/v1/classes/assign-students:
+    post:
+      consumes:
+      - application/json
+      description: Assign multiple students to a class in the database
+      parameters:
+      - description: Assign students to class
+        in: body
+        name: classAssignStudents
+        required: true
+        schema:
+          $ref: '#/definitions/models.ClassAssignStudents'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success message
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request - Invalid Input
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error - Database Issue
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Assign Students to Class
+      tags:
+      - Classes
+  /api/v1/classes/assign-teachers:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes a class from the database by ID
+      parameters:
+      - description: Class ID
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete Class
+      tags:
+      - Classes
+  /api/v1/classes/details:
+    get:
+      consumes:
+      - application/json
+      description: Fetch assigned students and teachers in the class
+      parameters:
+      - description: 'Page number (default: 1)'
+        in: query
+        name: page
+        type: integer
+      - description: 'Number of items per page (default: 15)'
+        in: query
+        name: pageSize
+        type: integer
+      - description: Class ID
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get Class by Id
+      tags:
+      - Classes
+  /api/v1/classes/unassign-students:
+    delete:
+      consumes:
+      - application/json
+      description: Unassigns a student from a class in the database
+      parameters:
+      - description: Unassigns students from a class
+        in: body
+        name: classAssignStudents
+        required: true
+        schema:
+          $ref: '#/definitions/models.ClassAssignStudents'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success message
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request - Invalid Input
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error - Database Issue
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Unassign Student from a Class
+      tags:
+      - Classes
+  /api/v1/classes/unassign-teachers:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes a class from the database by ID
+      parameters:
+      - description: Class ID
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Unassig a Teacher in a Class
       tags:
       - Classes
   /api/v1/materials:

@@ -75,7 +75,7 @@ func ClassPostHandler(c *gin.Context) {
 	}
 
 	// Call CreateUser with the extracted values
-	user, err := classesRepo.CreateClass(context.Background(), req.Name, req.Description, req.Teacher_ID)
+	user, err := classesRepo.CreateClass(context.Background(), req.Name, req.Description, req.Teacher_ID, req.Grade)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -120,6 +120,7 @@ func ClassUpdateHandler(c *gin.Context) {
 		req.Name,
 		req.Description,
 		req.Teacher_ID,
+		req.Grade,
 	)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
