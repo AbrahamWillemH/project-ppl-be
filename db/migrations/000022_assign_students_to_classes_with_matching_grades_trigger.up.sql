@@ -5,8 +5,7 @@ BEGIN
     INSERT INTO assigned_students_class (class_id, student_id)
     SELECT c.id, NEW.id
     FROM classes c
-    WHERE c.grade = NEW.grade
-    ON CONFLICT (class_id, student_id) DO NOTHING;
+    WHERE c.grade = NEW.grade;
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
@@ -25,8 +24,7 @@ BEGIN
     INSERT INTO assigned_students_class (class_id, student_id)
     SELECT NEW.id, s.id
     FROM students s
-    WHERE s.grade = NEW.grade
-    ON CONFLICT (class_id, student_id) DO NOTHING;
+    WHERE s.grade = NEW.grade;
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;

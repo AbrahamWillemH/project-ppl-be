@@ -400,31 +400,6 @@ paths:
       summary: Assign Students to Class
       tags:
       - Classes
-  /api/v1/classes/assign-teachers:
-    delete:
-      consumes:
-      - application/json
-      description: Deletes a class from the database by ID
-      parameters:
-      - description: Class ID
-        in: query
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Delete Class
-      tags:
-      - Classes
   /api/v1/classes/details:
     get:
       consumes:
@@ -493,31 +468,6 @@ paths:
       security:
       - BearerAuth: []
       summary: Unassign Student from a Class
-      tags:
-      - Classes
-  /api/v1/classes/unassign-teachers:
-    delete:
-      consumes:
-      - application/json
-      description: Deletes a class from the database by ID
-      parameters:
-      - description: Class ID
-        in: query
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Unassig a Teacher in a Class
       tags:
       - Classes
   /api/v1/materials:

@@ -32,3 +32,8 @@ type ClassAssignStudents struct {
 	ID         int   `json:"id" db:"id"`
 	Student_ID []int `json:"student_id" db:"student_id"`
 }
+
+type ClassAssignTeachers struct {
+	ID         int   `json:"id" db:"id"`
+	Teacher_ID []int `json:"teacher_id" db:"teacher_id"`
+}

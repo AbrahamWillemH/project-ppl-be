@@ -292,46 +292,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/classes/assign-teachers": {
-            "delete": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Deletes a class from the database by ID",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Classes"
-                ],
-                "summary": "Delete Class",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Class ID",
-                        "name": "id",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                }
-            }
-        },
         "/api/v1/classes/details": {
             "get": {
                 "security": [
@@ -432,46 +392,6 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Internal Server Error - Database Issue",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/classes/unassign-teachers": {
-            "delete": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Deletes a class from the database by ID",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Classes"
-                ],
-                "summary": "Unassig a Teacher in a Class",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Class ID",
-                        "name": "id",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
                         "schema": {
                             "type": "object",
                             "additionalProperties": {
