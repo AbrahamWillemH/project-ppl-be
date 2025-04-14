@@ -227,3 +227,41 @@ func (r *ClassRepository) UnassignStudents(ctx context.Context, classID int, stu
 	_, err := config.DB.Exec(ctx, query, args...)
 	return err
 }
+
+// GettAllClasses retrieves all classes from the database
+func (r *ClassRepository) GetClassId(ctx context.Context, grade, teacher_id int) ([]models.Class, int, error) {
+	sb := sqlbuilder.NewSelectBuilder()
+	sb.Select("classes.id").
+		From("classes").
+		Join("teachers", "classes.teacher_id = teachers.id").
+		Where(sb.Equal("grade", grade), sb.Equal("teacher_id", teacher_id))
+
+	query, args := sb.BuildWithFlavor(sqlbuilder.PostgreSQL)
+	rows, err := config.DB.Query(ctx, query, args...)
+	if err != nil {
+		return nil, 0, err
+	}
+	defer rows.Close()
+
+	var classes []models.Class
+	for rows.Next() {
+		var class models.Class
+		if err := rows.Scan(&class.ID); err != nil {
+			return nil, 0, err
+		}
+		classes = append(classes, class)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, 0, err
+	}
+
+	countQuery := "SELECT COUNT(*) FROM classes"
+	var total int
+	err = config.DB.QueryRow(ctx, countQuery).Scan(&total)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	return classes, total, nil
+}

@@ -6,6 +6,7 @@ import (
 	v1 "project-ppl-be/src/api/v1"
 	auth "project-ppl-be/src/api/v1/auth"
 	classes "project-ppl-be/src/api/v1/classes"
+	discussions "project-ppl-be/src/api/v1/discussions"
 	materials "project-ppl-be/src/api/v1/materials"
 	students "project-ppl-be/src/api/v1/students"
 	teachers "project-ppl-be/src/api/v1/teachers"
@@ -57,6 +58,7 @@ func SetupRouter() *gin.Engine {
 		classesGroup := v1Group.Group("/classes")
 		classesGroup.Use(middleware.AuthMiddleware(), middleware.AdminMiddleware())
 		classesGroup.GET("", classes.ClassGetHandler)
+		classesGroup.GET("/class-id", classes.GetClassIDHandler)
 		classesGroup.GET("/details", classes.ClassGetByIdHandler)
 		classesGroup.POST("/assign-students", classes.ClassAssignStudentsHandler)
 		classesGroup.DELETE("/unassign-students", classes.ClassUnassignStudentsHandler)
@@ -68,6 +70,7 @@ func SetupRouter() *gin.Engine {
 		materialsGroup := v1Group.Group("/materials")
 		materialsGroup.Use(middleware.AuthMiddleware(), middleware.TeacherMiddleware())
 		materialsGroup.GET("", materials.MaterialsGetHandler)
+		materialsGroup.GET("/from-class", materials.MaterialsGetByClassIdHandler)
 		materialsGroup.POST("", materials.MaterialsPostHandler)
 		materialsGroup.PATCH("", materials.MaterialsUpdateHandler)
 		materialsGroup.DELETE("", materials.MaterialsDeleteHandler)
@@ -79,6 +82,14 @@ func SetupRouter() *gin.Engine {
 		exercisesGroup.POST("", materials.MaterialsPostHandler)
 		exercisesGroup.PATCH("", materials.MaterialsUpdateHandler)
 		exercisesGroup.DELETE("", materials.MaterialsDeleteHandler)
+
+		// DISCUSSIONS
+		discussionsGroup := v1Group.Group("/discussions")
+		discussionsGroup.Use(middleware.AuthMiddleware(), middleware.StudentMiddleware())
+		discussionsGroup.GET("", discussions.DiscussionsGetHandler)
+		discussionsGroup.POST("", discussions.DiscussionsPostHandler)
+		discussionsGroup.PATCH("", discussions.DiscussionsUpdateHandler)
+		discussionsGroup.DELETE("", discussions.DiscussionsDeleteHandler)
 	}
 
 	fmt.Println("Server is running at http://localhost:8080")

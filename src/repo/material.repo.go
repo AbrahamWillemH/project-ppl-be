@@ -12,10 +12,10 @@ import (
 // StudentRepository struct
 type MaterialRepository struct{}
 
-// GetAllStudents retrieves all materials from the database
+// GetAllMaterials retrieves all materials from the database
 func (r *MaterialRepository) GetAllMaterials(ctx context.Context, page, pageSize int) ([]models.Material, int, error) {
 	sb := sqlbuilder.NewSelectBuilder()
-	sb.Select("id", "class_id", "title", "description", "teacher_id").
+	sb.Select("id", "class_id", "title", "description", "content", "teacher_id").
 		From("materials").
 		Limit(pageSize).
 		Offset((page - 1) * pageSize) // OFFSET = (page - 1) * pageSize
@@ -43,6 +43,43 @@ func (r *MaterialRepository) GetAllMaterials(ctx context.Context, page, pageSize
 	var total int
 
 	err = config.DB.QueryRow(ctx, countQuery).Scan(&total)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	return materials, total, nil
+}
+
+func (r *MaterialRepository) GetMaterialsByClass(ctx context.Context, page, pageSize, id int) ([]models.Material, int, error) {
+	sb := sqlbuilder.NewSelectBuilder()
+	sb.Select("id", "class_id", "title", "description", "content", "teacher_id").
+		From("materials").
+		Where(sb.Equal("class_id", id)).
+		Limit(pageSize).
+		Offset((page - 1) * pageSize) // OFFSET = (page - 1) * pageSize
+
+	query, args := sb.BuildWithFlavor(sqlbuilder.PostgreSQL)
+	rows, err := config.DB.Query(ctx, query, args...)
+	if err != nil {
+		return nil, 0, err
+	}
+	defer rows.Close()
+
+	var materials []models.Material
+	for rows.Next() {
+		var material models.Material
+		err := rows.Scan(&material.ID, &material.Class_ID, &material.Title, &material.Description, &material.Content, &material.Teacher_ID)
+		if err != nil {
+			return nil, 0, err
+		}
+		materials = append(materials, material)
+	}
+
+	// Hitung total jumlah data untuk pagination
+	countQuery := "SELECT COUNT(*) FROM materials WHERE class_id = $1"
+
+	var total int
+	err = config.DB.QueryRow(ctx, countQuery, id).Scan(&total)
 	if err != nil {
 		return nil, 0, err
 	}

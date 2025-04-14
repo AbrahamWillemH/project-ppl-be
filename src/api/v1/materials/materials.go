@@ -55,6 +55,57 @@ func MaterialsGetHandler(c *gin.Context) {
 	})
 }
 
+// MaterialsGetByClassIdHandler retrieves a list of materials by class id
+// @Summary Get Materials by class id
+// @Description Fetch materials by class id from the database with pagination
+// @Tags Materials
+// @Security BearerAuth
+// @Accept  json
+// @Produce json
+// @Param id query int true "Class ID"
+// @Param page query int false "Page number (default: 1)"
+// @Param pageSize query int false "Number of items per page (default: 15)"
+// @Success 200 {object} map[string]interface{}
+// @Router /api/v1/materials/from-class [get]
+func MaterialsGetByClassIdHandler(c *gin.Context) {
+	// Extract `id` from query parameters
+	idStr := c.Query("id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil || id <= 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid or missing class ID"})
+		return
+	}
+
+	// Ambil parameter query dari request
+	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+	pageSize, _ := strconv.Atoi(c.DefaultQuery("pageSize", "15"))
+
+	if page < 1 {
+		page = 1
+	}
+	if pageSize < 1 {
+		pageSize = 15
+	}
+
+	// Ambil data dengan pagination dan filter
+	materials, total, err := materialsRepo.GetMaterialsByClass(context.Background(), page, pageSize, id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Format respons dengan metadata pagination
+	c.JSON(http.StatusOK, gin.H{
+		"materials": materials,
+		"meta": gin.H{
+			"page":      page,
+			"pageSize":  pageSize,
+			"total":     total,
+			"totalPage": int(math.Ceil(float64(total) / float64(pageSize))),
+		},
+	})
+}
+
 // MaterialsPostHandler creates a new material
 // @Summary Create Material
 // @Description Create a new material in the database

@@ -1,4 +1,4 @@
-package classes
+package discussions
 
 import (
 	"context"
@@ -11,19 +11,19 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var classesRepo = repo.ClassRepository{}
+var discussionsRepo = repo.ClassRepository{}
 
-// ClassGetHandler retrieves a list of classes
+// ClassGetHandler retrieves a list of discussions
 // @Summary Get Class
-// @Description Fetch all classes from the database with pagination
-// @Tags Classes
+// @Description Fetch all discussions from the database with pagination
+// @Tags discussions
 // @Security BearerAuth
 // @Accept  json
 // @Produce json
 // @Param page query int false "Page number (default: 1)"
 // @Param pageSize query int false "Number of items per page (default: 15)"
 // @Success 200 {object} map[string]interface{}
-// @Router /api/v1/classes [get]
+// @Router /api/v1/discussions [get]
 func ClassGetHandler(c *gin.Context) {
 	// Ambil parameter query dari request
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
@@ -37,7 +37,7 @@ func ClassGetHandler(c *gin.Context) {
 	}
 
 	// Ambil data dengan pagination dan filter grade
-	classes, total, err := classesRepo.GettAllClasses(context.Background(), page, pageSize)
+	discussions, total, err := discussionsRepo.GettAllDiscussions(context.Background(), page, pageSize)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -45,7 +45,7 @@ func ClassGetHandler(c *gin.Context) {
 
 	// Format respons dengan metadata pagination
 	c.JSON(http.StatusOK, gin.H{
-		"classes": classes,
+		"discussions": discussions,
 		"meta": gin.H{
 			"page":      page,
 			"pageSize":  pageSize,
@@ -64,7 +64,7 @@ func ClassGetHandler(c *gin.Context) {
 // @Produce json
 // @Param user body models.CreateClassRequest true "Class data"
 // @Success 200 {object} models.Class
-// @Router /api/v1/classes [post]
+// @Router /api/v1/discussions [post]
 func ClassPostHandler(c *gin.Context) {
 	var req models.CreateClassRequest
 
@@ -75,7 +75,7 @@ func ClassPostHandler(c *gin.Context) {
 	}
 
 	// Call CreateUser with the extracted values
-	user, err := classesRepo.CreateClass(context.Background(), req.Name, req.Description, req.Teacher_ID, req.Grade)
+	user, err := discussionsRepo.CreateClass(context.Background(), req.Name, req.Description, req.Teacher_ID, req.Grade)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -95,7 +95,7 @@ func ClassPostHandler(c *gin.Context) {
 // @Param id query int true "Class ID"
 // @Param class body models.CreateClassRequest true "Updated Class Data"
 // @Success 200 {object} models.Class
-// @Router /api/v1/classes [patch]
+// @Router /api/v1/discussions [patch]
 func ClassUpdateHandler(c *gin.Context) {
 	var req models.CreateClassRequest
 
@@ -114,7 +114,7 @@ func ClassUpdateHandler(c *gin.Context) {
 	}
 
 	// Call UpdateTeacher with the correct parameters
-	class, err := classesRepo.UpdateClass(
+	class, err := discussionsRepo.UpdateClass(
 		context.Background(),
 		id,
 		req.Name,
@@ -140,7 +140,7 @@ func ClassUpdateHandler(c *gin.Context) {
 // @Produce  json
 // @Param id query int true "Class ID"
 // @Success 200 {object} map[string]string
-// @Router /api/v1/classes [delete]
+// @Router /api/v1/discussions [delete]
 func ClassDeleteHandler(c *gin.Context) {
 	// Extract `id` from query parameters
 	idStr := c.Query("id")
@@ -151,7 +151,7 @@ func ClassDeleteHandler(c *gin.Context) {
 	}
 
 	// Call DeleteTeacher function from repository
-	err = classesRepo.DeleteClass(context.Background(), id)
+	err = discussionsRepo.DeleteClass(context.Background(), id)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -159,54 +159,4 @@ func ClassDeleteHandler(c *gin.Context) {
 
 	// Respond with success message
 	c.JSON(http.StatusOK, gin.H{"message": "Class deleted successfully"})
-}
-
-// GetClassIDHandler retrieves class id based on grade and logged in teacher
-// @Summary Get class id by grade and logged in teacher
-// @Description Fetch class id
-// @Tags Classes
-// @Security BearerAuth
-// @Accept  json
-// @Produce json
-// @Param grade query int true "Grade"
-// @Param teacher_id query int true "teacher_id"
-// @Success 200 {object} map[string]interface{}
-// @Router /api/v1/classes/class-id [get]
-func GetClassIDHandler(c *gin.Context) {
-	// Ambil `grade` dari query
-	gradeStr := c.Query("grade")
-	grade, err := strconv.Atoi(gradeStr)
-	if err != nil || grade <= 0 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid or missing grade"})
-		return
-	}
-
-	// Ambil `teacher_id` dari query
-	teacherStr := c.Query("teacher_id")
-	teacherID, err := strconv.Atoi(teacherStr)
-	if err != nil || teacherID <= 0 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid or missing teacher_id"})
-		return
-	}
-
-	// Ambil data dari repo
-	classes, total, err := classesRepo.GetClassId(context.Background(), grade, teacherID)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-
-	// Jika tidak ada kelas ditemukan
-	if len(classes) == 0 {
-		c.JSON(http.StatusNotFound, gin.H{"message": "No class found"})
-		return
-	}
-
-	// Ambil hanya ID saja dari kelas pertama
-	classID := classes[0].ID
-
-	c.JSON(http.StatusOK, gin.H{
-		"class_id": classID,
-		"total":    total,
-	})
 }
