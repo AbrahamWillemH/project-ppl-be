@@ -56,7 +56,7 @@ func SetupRouter() *gin.Engine {
 
 		// CLASSES
 		classesGroup := v1Group.Group("/classes")
-		classesGroup.Use(middleware.AuthMiddleware(), middleware.AdminMiddleware())
+		classesGroup.Use(middleware.AuthMiddleware(), middleware.TeacherMiddleware())
 		classesGroup.GET("", classes.ClassGetHandler)
 		classesGroup.GET("/class-id", classes.GetClassIDHandler)
 		classesGroup.GET("/details", classes.ClassGetByIdHandler)
@@ -87,9 +87,9 @@ func SetupRouter() *gin.Engine {
 		discussionsGroup := v1Group.Group("/discussions")
 		discussionsGroup.Use(middleware.AuthMiddleware(), middleware.StudentMiddleware())
 		discussionsGroup.GET("", discussions.DiscussionsGetHandler)
-		discussionsGroup.POST("", discussions.DiscussionsPostHandler)
-		discussionsGroup.PATCH("", discussions.DiscussionsUpdateHandler)
-		discussionsGroup.DELETE("", discussions.DiscussionsDeleteHandler)
+		// discussionsGroup.POST("", discussions.DiscussionsPostHandler)
+		// discussionsGroup.PATCH("", discussions.DiscussionsUpdateHandler)
+		// discussionsGroup.DELETE("", discussions.DiscussionsDeleteHandler)
 	}
 
 	fmt.Println("Server is running at http://localhost:8080")

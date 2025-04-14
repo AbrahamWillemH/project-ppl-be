@@ -11,10 +11,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var discussionsRepo = repo.ClassRepository{}
+var discussionsRepo = repo.DiscussionRepository{}
 
-// ClassGetHandler retrieves a list of discussions
-// @Summary Get Class
+// DiscussionGetHandler retrieves a list of discussions
+// @Summary Get Discussion
 // @Description Fetch all discussions from the database with pagination
 // @Tags discussions
 // @Security BearerAuth
@@ -24,7 +24,7 @@ var discussionsRepo = repo.ClassRepository{}
 // @Param pageSize query int false "Number of items per page (default: 15)"
 // @Success 200 {object} map[string]interface{}
 // @Router /api/v1/discussions [get]
-func ClassGetHandler(c *gin.Context) {
+func DiscussionsGetHandler(c *gin.Context) {
 	// Ambil parameter query dari request
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
 	pageSize, _ := strconv.Atoi(c.DefaultQuery("pageSize", "15"))
@@ -55,18 +55,18 @@ func ClassGetHandler(c *gin.Context) {
 	})
 }
 
-// ClassPostHandler creates a new class
-// @Summary Create Class
-// @Description Create a new class in the database
-// @Tags Classes
+// DiscussionPostHandler creates a new discussion
+// @Summary Create Discussion
+// @Description Create a new discussion in the database
+// @Tags Discussiones
 // @Security BearerAuth
 // @Accept json
 // @Produce json
-// @Param user body models.CreateClassRequest true "Class data"
-// @Success 200 {object} models.Class
+// @Param user body models.CreateDiscussionRequest true "Discussion data"
+// @Success 200 {object} models.Discussion
 // @Router /api/v1/discussions [post]
-func ClassPostHandler(c *gin.Context) {
-	var req models.CreateClassRequest
+func DiscussionPostHandler(c *gin.Context) {
+	var req models.CreateDiscussionRequest
 
 	// Parse JSON request body
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -75,7 +75,7 @@ func ClassPostHandler(c *gin.Context) {
 	}
 
 	// Call CreateUser with the extracted values
-	user, err := discussionsRepo.CreateClass(context.Background(), req.Name, req.Description, req.Teacher_ID, req.Grade)
+	user, err := discussionsRepo.CreateDiscussion(context.Background(), req.Name, req.Description, req.Teacher_ID, req.Grade)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -85,25 +85,25 @@ func ClassPostHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, user)
 }
 
-// ClassUpdateHandler updates an existing class
-// @Summary Update Class
-// @Description Updates an existing class in the database
-// @Tags Classes
+// DiscussionUpdateHandler updates an existing discussion
+// @Summary Update Discussion
+// @Description Updates an existing discussion in the database
+// @Tags Discussiones
 // @Security BearerAuth
 // @Accept  json
 // @Produce  json
-// @Param id query int true "Class ID"
-// @Param class body models.CreateClassRequest true "Updated Class Data"
-// @Success 200 {object} models.Class
+// @Param id query int true "Discussion ID"
+// @Param discussion body models.CreateDiscussionRequest true "Updated Discussion Data"
+// @Success 200 {object} models.Discussion
 // @Router /api/v1/discussions [patch]
-func ClassUpdateHandler(c *gin.Context) {
-	var req models.CreateClassRequest
+func DiscussionUpdateHandler(c *gin.Context) {
+	var req models.CreateDiscussionRequest
 
 	// Extract `id` from query parameters
 	idStr := c.Query("id") // This will get the ID from query params
 	id, err := strconv.Atoi(idStr)
 	if err != nil || id <= 0 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid or missing class ID"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid or missing discussion ID"})
 		return
 	}
 
@@ -114,7 +114,7 @@ func ClassUpdateHandler(c *gin.Context) {
 	}
 
 	// Call UpdateTeacher with the correct parameters
-	class, err := discussionsRepo.UpdateClass(
+	discussion, err := discussionsRepo.UpdateDiscussion(
 		context.Background(),
 		id,
 		req.Name,
@@ -128,20 +128,20 @@ func ClassUpdateHandler(c *gin.Context) {
 	}
 
 	// Respond with the updated teacher
-	c.JSON(http.StatusOK, class)
+	c.JSON(http.StatusOK, discussion)
 }
 
-// ClassDeleteHandler deletes a class
-// @Summary Delete Class
-// @Description Deletes a class from the database by ID
-// @Tags Classes
+// DiscussionDeleteHandler deletes a discussion
+// @Summary Delete Discussion
+// @Description Deletes a discussion from the database by ID
+// @Tags Discussiones
 // @Security BearerAuth
 // @Accept  json
 // @Produce  json
-// @Param id query int true "Class ID"
+// @Param id query int true "Discussion ID"
 // @Success 200 {object} map[string]string
 // @Router /api/v1/discussions [delete]
-func ClassDeleteHandler(c *gin.Context) {
+func DiscussionDeleteHandler(c *gin.Context) {
 	// Extract `id` from query parameters
 	idStr := c.Query("id")
 	id, err := strconv.Atoi(idStr)
@@ -151,12 +151,12 @@ func ClassDeleteHandler(c *gin.Context) {
 	}
 
 	// Call DeleteTeacher function from repository
-	err = discussionsRepo.DeleteClass(context.Background(), id)
+	err = discussionsRepo.DeleteDiscussion(context.Background(), id)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
 	// Respond with success message
-	c.JSON(http.StatusOK, gin.H{"message": "Class deleted successfully"})
+	c.JSON(http.StatusOK, gin.H{"message": "Discussion deleted successfully"})
 }
