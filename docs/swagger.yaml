@@ -44,6 +44,19 @@ definitions:
       teacher_id:
         type: integer
     type: object
+  models.CreateDiscussionRequest:
+    properties:
+      description:
+        type: string
+      id:
+        type: integer
+      replies:
+        type: string
+      student_id:
+        type: string
+      topic:
+        type: string
+    type: object
   models.CreateMaterialRequest:
     properties:
       class_id:
@@ -94,6 +107,19 @@ definitions:
     - password
     - role
     - username
+    type: object
+  models.Discussion:
+    properties:
+      description:
+        type: string
+      id:
+        type: integer
+      replies:
+        type: string
+      student_id:
+        type: string
+      topic:
+        type: string
     type: object
   models.Material:
     properties:
@@ -499,6 +525,108 @@ paths:
       summary: Unassign Student from a Class
       tags:
       - Classes
+  /api/v1/discussions:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes a discussion from the database by ID
+      parameters:
+      - description: Discussion ID
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete Discussion
+      tags:
+      - Discussions
+    get:
+      consumes:
+      - application/json
+      description: Fetch all discussions from the database with pagination
+      parameters:
+      - description: 'Page number (default: 1)'
+        in: query
+        name: page
+        type: integer
+      - description: 'Number of items per page (default: 15)'
+        in: query
+        name: pageSize
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get Discussions
+      tags:
+      - Discussions
+    patch:
+      consumes:
+      - application/json
+      description: Updates an existing discussion in the database
+      parameters:
+      - description: Discussion ID
+        in: query
+        name: id
+        required: true
+        type: integer
+      - description: Updated Discussion Data
+        in: body
+        name: discussion
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateDiscussionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Discussion'
+      security:
+      - BearerAuth: []
+      summary: Update Discussion
+      tags:
+      - Discussions
+    post:
+      consumes:
+      - application/json
+      description: Create a new discussion in the database
+      parameters:
+      - description: Discussion data
+        in: body
+        name: discussion
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateDiscussionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Discussion'
+      security:
+      - BearerAuth: []
+      summary: Create Discussion
+      tags:
+      - Discussions
   /api/v1/materials:
     delete:
       consumes:

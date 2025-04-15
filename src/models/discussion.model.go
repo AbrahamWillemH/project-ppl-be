@@ -5,7 +5,7 @@ type Discussion struct {
 	ID          int    `json:"id" db:"id"`
 	Student_ID  string `json:"student_id" db:"student_id"`
 	Topic       string `json:"topic" db:"topic"`
-	Description int    `json:"description" db:"description"`
+	Description string `json:"description" db:"description"`
 	Replies     string `json:"replies" db:"replies"`
 }
 
@@ -14,6 +14,6 @@ type CreateDiscussionRequest struct {
 	ID          int    `json:"id" db:"id"`
 	Student_ID  string `json:"student_id" db:"student_id"`
 	Topic       string `json:"topic" db:"topic"`
-	Description int    `json:"description" db:"description"`
+	Description string `json:"description" db:"description"`
 	Replies     string `json:"replies" db:"replies"`
 }
