@@ -2,8 +2,11 @@ package repo
 
 import (
 	"context"
+	"database/sql"
+	"encoding/json"
 	"project-ppl-be/config"
 	"project-ppl-be/src/models"
+	"time"
 
 	"github.com/huandu/go-sqlbuilder"
 )
@@ -135,4 +138,69 @@ func (r *DiscussionRepository) GetDiscussionById(ctx context.Context, id int) (*
 	}
 
 	return &discussion, nil
+}
+
+func (r *DiscussionRepository) ReplyDiscussion(ctx context.Context, discussionID int, replies string, studentID int, studentName string) (models.Discussion, error) {
+	// Ambil existing replies dari discussion
+	var existingRepliesJSON []byte
+	err := config.DB.QueryRow(ctx, "SELECT replies FROM general_forum WHERE id = $1", discussionID).Scan(&existingRepliesJSON)
+
+	// Cek apakah terjadi error lainnya selain tidak ditemukan baris
+	if err != nil && err != sql.ErrNoRows {
+		return models.Discussion{}, err
+	}
+
+	// Cek apakah existingRepliesJSON kosong (NULL atau empty)
+	var existingReplies []map[string]interface{}
+	if err == sql.ErrNoRows || len(existingRepliesJSON) == 0 {
+		// Jika baris tidak ditemukan atau kosong, inisialisasi dengan array kosong
+		existingReplies = []map[string]interface{}{}
+	} else {
+		// Decode existing replies jika ada
+		if err := json.Unmarshal(existingRepliesJSON, &existingReplies); err != nil {
+			return models.Discussion{}, err
+		}
+	}
+
+	// Buat reply baru
+	newReply := map[string]interface{}{
+		"id":    studentID,
+		"name":  studentName,
+		"time":  time.Now().Format(time.RFC3339),
+		"reply": replies,
+	}
+
+	// Append reply baru ke existing replies
+	existingReplies = append(existingReplies, newReply)
+
+	// Encode kembali ke JSON
+	updatedRepliesJSON, err := json.Marshal(existingReplies)
+	if err != nil {
+		return models.Discussion{}, err
+	}
+
+	// Update discussion dengan replies terbaru
+	sb := sqlbuilder.NewUpdateBuilder()
+	sb.Update("general_forum").
+		Set(
+			sb.Assign("replies", updatedRepliesJSON),
+		).
+		Where(sb.Equal("id", discussionID))
+
+	query, args := sb.BuildWithFlavor(sqlbuilder.PostgreSQL)
+	query += " RETURNING id, student_id, topic, description, replies"
+
+	var discussion models.Discussion
+	err = config.DB.QueryRow(ctx, query, args...).Scan(
+		&discussion.ID,
+		&discussion.Student_ID,
+		&discussion.Topic,
+		&discussion.Description,
+		&discussion.Replies,
+	)
+	if err != nil {
+		return models.Discussion{}, err
+	}
+
+	return discussion, nil
 }

@@ -140,6 +140,15 @@ definitions:
     required:
     - migrate
     type: object
+  models.ReplyDiscussion:
+    properties:
+      replies:
+        type: string
+      student_id:
+        type: integer
+      student_name:
+        type: string
+    type: object
   models.Student:
     properties:
       curr_score:
@@ -621,6 +630,35 @@ paths:
       security:
       - BearerAuth: []
       summary: Create Discussion
+      tags:
+      - Discussions
+  /api/v1/discussions/reply:
+    patch:
+      consumes:
+      - application/json
+      description: Replies or comments on an existing discussion
+      parameters:
+      - description: Discussion ID
+        in: query
+        name: id
+        required: true
+        type: integer
+      - description: Updated Discussion Data
+        in: body
+        name: discussion
+        required: true
+        schema:
+          $ref: '#/definitions/models.ReplyDiscussion'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Discussion'
+      security:
+      - BearerAuth: []
+      summary: Reply or comment on a Discussion
       tags:
       - Discussions
   /api/v1/materials:

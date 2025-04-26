@@ -2,6 +2,7 @@ package discussions
 
 import (
 	"context"
+	"fmt"
 	"math"
 	"net/http"
 	"project-ppl-be/src/models"
@@ -152,4 +153,71 @@ func DiscussionsDeleteHandler(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Discussion deleted successfully"})
+}
+
+// DiscussionReplyHandler replies an existing discussion
+// @Summary Reply or comment on a Discussion
+// @Description Replies or comments on an existing discussion
+// @Tags Discussions
+// @Security BearerAuth
+// @Accept json
+// @Produce json
+// @Param id query int true "Discussion ID"
+// @Param discussion body models.ReplyDiscussion true "Updated Discussion Data"
+// @Success 200 {object} models.Discussion
+// @Router /api/v1/discussions/reply [patch]
+func DiscussionsReplyHandler(c *gin.Context) {
+	var req models.ReplyDiscussion
+
+	// Ambil ID diskusi dari query string
+	idStr := c.Query("id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil || id <= 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid or missing discussion ID"})
+		return
+	}
+
+	// Debug: Log ID diskusi yang diterima
+	fmt.Println("Received Discussion ID:", id)
+
+	// Bind JSON request body ke struct ReplyDiscussion
+	if err := c.ShouldBindJSON(&req); err != nil {
+		// Debug: Log error saat binding JSON
+		fmt.Println("Error binding JSON:", err.Error())
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Debug: Log body yang di-bind
+	fmt.Println("Received body:", req)
+
+	// Validasi bahwa "replies" tidak kosong
+	if req.Replies == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Replies cannot be empty"})
+		return
+	}
+
+	// Debug: Log replies yang diterima
+	fmt.Println("Replies received:", req.Replies)
+
+	// Panggil repository untuk menambahkan reply ke diskusi
+	discussion, err := discussionsRepo.ReplyDiscussion(
+		context.Background(),
+		id,
+		req.Replies,
+		req.Student_ID,
+		req.Student_Name,
+	)
+	if err != nil {
+		// Debug: Log error dari repository
+		fmt.Println("Error in repository:", err.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Debug: Log hasil diskusi yang diperbarui
+	fmt.Println("Updated Discussion:", discussion)
+
+	// Kirim response dengan status OK dan data diskusi yang diperbarui
+	c.JSON(http.StatusOK, discussion)
 }

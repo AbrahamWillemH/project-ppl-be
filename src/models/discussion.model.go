@@ -16,3 +16,9 @@ type CreateDiscussionRequest struct {
 	Description string `json:"description" db:"description"`
 	Replies     any    `json:"replies" db:"replies"`
 }
+
+type ReplyDiscussion struct {
+	Student_ID   int    `json:"student_id"`
+	Student_Name string `json:"student_name"`
+	Replies      string `json:"replies"`
+}

@@ -89,6 +89,7 @@ func SetupRouter() *gin.Engine {
 		discussionsGroup.GET("", discussions.DiscussionsGetHandler)
 		discussionsGroup.POST("", discussions.DiscussionsPostHandler)
 		discussionsGroup.PATCH("", discussions.DiscussionsUpdateHandler)
+		discussionsGroup.PATCH("/reply", discussions.DiscussionsReplyHandler)
 		discussionsGroup.DELETE("", discussions.DiscussionsDeleteHandler)
 	}
 

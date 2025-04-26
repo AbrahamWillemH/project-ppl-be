@@ -609,6 +609,52 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/discussions/reply": {
+            "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Replies or comments on an existing discussion",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Discussions"
+                ],
+                "summary": "Reply or comment on a Discussion",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Discussion ID",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "description": "Updated Discussion Data",
+                        "name": "discussion",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.ReplyDiscussion"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Discussion"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/materials": {
             "get": {
                 "security": [
@@ -1592,6 +1638,20 @@ const docTemplate = `{
                 "migrate": {
                     "type": "string",
                     "default": "up"
+                }
+            }
+        },
+        "models.ReplyDiscussion": {
+            "type": "object",
+            "properties": {
+                "replies": {
+                    "type": "string"
+                },
+                "student_id": {
+                    "type": "integer"
+                },
+                "student_name": {
+                    "type": "string"
                 }
             }
         },
