@@ -48,12 +48,9 @@ definitions:
     properties:
       description:
         type: string
-      id:
-        type: integer
-      replies:
-        type: string
+      replies: {}
       student_id:
-        type: string
+        type: integer
       topic:
         type: string
     type: object
@@ -114,10 +111,9 @@ definitions:
         type: string
       id:
         type: integer
-      replies:
-        type: string
+      replies: {}
       student_id:
-        type: string
+        type: integer
       topic:
         type: string
     type: object

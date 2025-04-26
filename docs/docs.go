@@ -1456,14 +1456,9 @@ const docTemplate = `{
                 "description": {
                     "type": "string"
                 },
-                "id": {
-                    "type": "integer"
-                },
-                "replies": {
-                    "type": "string"
-                },
+                "replies": {},
                 "student_id": {
-                    "type": "string"
+                    "type": "integer"
                 },
                 "topic": {
                     "type": "string"
@@ -1556,11 +1551,9 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
-                "replies": {
-                    "type": "string"
-                },
+                "replies": {},
                 "student_id": {
-                    "type": "string"
+                    "type": "integer"
                 },
                 "topic": {
                     "type": "string"

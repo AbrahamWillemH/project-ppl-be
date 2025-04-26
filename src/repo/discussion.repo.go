@@ -15,7 +15,7 @@ type DiscussionRepository struct{}
 func (r *DiscussionRepository) GetAllDiscussions(ctx context.Context, page, pageSize int) ([]models.Discussion, int, error) {
 	sb := sqlbuilder.NewSelectBuilder()
 	sb.Select("id", "student_id", "topic", "description", "replies").
-		From("discussions").
+		From("general_forum").
 		Limit(pageSize).
 		Offset((page - 1) * pageSize)
 
@@ -39,7 +39,7 @@ func (r *DiscussionRepository) GetAllDiscussions(ctx context.Context, page, page
 		return nil, 0, err
 	}
 
-	countQuery := "SELECT COUNT(*) FROM discussions"
+	countQuery := "SELECT COUNT(*) FROM general_forum"
 	var total int
 	err = config.DB.QueryRow(ctx, countQuery).Scan(&total)
 	if err != nil {
@@ -50,9 +50,9 @@ func (r *DiscussionRepository) GetAllDiscussions(ctx context.Context, page, page
 }
 
 // CreateDiscussion inserts a new discussion into the database
-func (r *DiscussionRepository) CreateDiscussion(ctx context.Context, studentID, topic, description, replies string) (models.Discussion, error) {
+func (r *DiscussionRepository) CreateDiscussion(ctx context.Context, studentID int, topic, description string, replies any) (models.Discussion, error) {
 	sb := sqlbuilder.NewInsertBuilder()
-	sb.InsertInto("discussions").
+	sb.InsertInto("general_forum").
 		Cols("student_id", "topic", "description", "replies").
 		Values(studentID, topic, description, replies).
 		Returning("id")
@@ -75,9 +75,9 @@ func (r *DiscussionRepository) CreateDiscussion(ctx context.Context, studentID, 
 }
 
 // UpdateDiscussion updates an existing discussion
-func (r *DiscussionRepository) UpdateDiscussion(ctx context.Context, id int, studentID, topic, description, replies string) (models.Discussion, error) {
+func (r *DiscussionRepository) UpdateDiscussion(ctx context.Context, id int, studentID int, topic, description string, replies any) (models.Discussion, error) {
 	sb := sqlbuilder.NewUpdateBuilder()
-	sb.Update("discussions").
+	sb.Update("general_forum").
 		Set(
 			sb.Assign("student_id", studentID),
 			sb.Assign("topic", topic),
@@ -107,7 +107,7 @@ func (r *DiscussionRepository) UpdateDiscussion(ctx context.Context, id int, stu
 // DeleteDiscussion deletes a discussion from the database
 func (r *DiscussionRepository) DeleteDiscussion(ctx context.Context, id int) error {
 	sb := sqlbuilder.NewDeleteBuilder()
-	sb.DeleteFrom("discussions").Where(sb.Equal("id", id))
+	sb.DeleteFrom("general_forum").Where(sb.Equal("id", id))
 	query, args := sb.BuildWithFlavor(sqlbuilder.PostgreSQL)
 
 	_, err := config.DB.Exec(ctx, query, args...)
@@ -118,7 +118,7 @@ func (r *DiscussionRepository) DeleteDiscussion(ctx context.Context, id int) err
 func (r *DiscussionRepository) GetDiscussionById(ctx context.Context, id int) (*models.Discussion, error) {
 	sb := sqlbuilder.NewSelectBuilder()
 	sb.Select("id", "student_id", "topic", "description", "replies").
-		From("discussions").
+		From("general_forum").
 		Where(sb.Equal("id", id))
 
 	query, args := sb.BuildWithFlavor(sqlbuilder.PostgreSQL)
