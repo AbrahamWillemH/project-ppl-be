@@ -2,7 +2,7 @@
 //
 // @title Project PPL API
 // @version 0.2.1
-// @description API documentation for Project PPL - Kuda Hitam
+// @description API documentation for Project PPL - Learnify
 // @schemes https
 //
 // @securityDefinitions.apikey BearerAuth

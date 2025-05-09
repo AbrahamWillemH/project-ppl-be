@@ -1826,7 +1826,7 @@ var SwaggerInfo = &swag.Spec{
 	BasePath:         "",
 	Schemes:          []string{"https"},
 	Title:            "Project PPL API",
-	Description:      "API documentation for Project PPL - Kuda Hitam",
+	Description:      "API documentation for Project PPL - Learnify",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

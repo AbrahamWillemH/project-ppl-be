@@ -251,7 +251,7 @@ definitions:
     type: object
 info:
   contact: {}
-  description: API documentation for Project PPL - Kuda Hitam
+  description: API documentation for Project PPL - Learnify
   title: Project PPL API
   version: 0.2.1
 paths:
