@@ -46,6 +46,11 @@ func SetupRouter() *gin.Engine {
 		studentsGroup.DELETE("", students.StudentDeleteHandler)
 		studentsGroup.POST("grade-migrate", students.StudentGradeMigrateHandler)
 
+		// STUDENTS - NO ADMIN
+		studentAccessGroup := v1Group.Group("/students")
+		studentAccessGroup.Use(middleware.AuthMiddleware())
+		studentAccessGroup.GET("/details", students.StudentGetByIDHandler)
+
 		// TEACHERS
 		teachersGroup := v1Group.Group("/teachers")
 		teachersGroup.Use(middleware.AuthMiddleware(), middleware.AdminMiddleware())
@@ -56,7 +61,7 @@ func SetupRouter() *gin.Engine {
 
 		// CLASSES
 		classesGroup := v1Group.Group("/classes")
-		classesGroup.Use(middleware.AuthMiddleware(), middleware.TeacherMiddleware())
+		classesGroup.Use(middleware.AuthMiddleware())
 		classesGroup.GET("", classes.ClassGetHandler)
 		classesGroup.GET("/class-id", classes.GetClassIDHandler)
 		classesGroup.GET("/details", classes.ClassGetByIdHandler)
@@ -66,14 +71,23 @@ func SetupRouter() *gin.Engine {
 		classesGroup.PATCH("", classes.ClassUpdateHandler)
 		classesGroup.DELETE("", classes.ClassDeleteHandler)
 
+		// CLASSES FOR STUDENTS
+		classesForStudentsGroup := v1Group.Group("/classes")
+		classesForStudentsGroup.Use(middleware.AuthMiddleware())
+		classesForStudentsGroup.GET("/assigned", classes.GetClassForStudentHandler)
+
 		// MATERIALS
 		materialsGroup := v1Group.Group("/materials")
 		materialsGroup.Use(middleware.AuthMiddleware(), middleware.TeacherMiddleware())
 		materialsGroup.GET("", materials.MaterialsGetHandler)
-		materialsGroup.GET("/from-class", materials.MaterialsGetByClassIdHandler)
 		materialsGroup.POST("", materials.MaterialsPostHandler)
 		materialsGroup.PATCH("", materials.MaterialsUpdateHandler)
 		materialsGroup.DELETE("", materials.MaterialsDeleteHandler)
+
+		// MATERIALS NO ADMIN
+		materialsAccessGroup := v1Group.Group("/materials")
+		materialsAccessGroup.Use(middleware.AuthMiddleware())
+		materialsAccessGroup.GET("/from-class", materials.MaterialsGetByClassIdHandler)
 
 		// EXERCISES
 		exercisesGroup := v1Group.Group("/exercises")

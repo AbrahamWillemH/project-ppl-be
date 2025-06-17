@@ -265,3 +265,58 @@ func (r *ClassRepository) GetClassId(ctx context.Context, grade, teacher_id int)
 
 	return classes, total, nil
 }
+
+// GetClassesByStudentID fetches all classes assigned to a student with pagination
+func (r *ClassRepository) GetClassesByStudentID(ctx context.Context, studentID, page, pageSize int) ([]models.Class, int, error) {
+	sb := sqlbuilder.NewSelectBuilder()
+
+	sb.Select(
+		"c.id", "c.name", "c.description",
+		"c.teacher_id", "t.name AS teacher_name",
+	).
+		From("assigned_students_class asc_tbl").
+		Join("classes c", "asc_tbl.class_id = c.id").
+		Join("teachers t", "c.teacher_id = t.id").
+		Where(sb.Equal("asc_tbl.student_id", studentID)).
+		Limit(pageSize).
+		Offset((page - 1) * pageSize)
+
+	query, args := sb.BuildWithFlavor(sqlbuilder.PostgreSQL)
+
+	rows, err := config.DB.Query(ctx, query, args...)
+	if err != nil {
+		return nil, 0, err
+	}
+	defer rows.Close()
+
+	var classes []models.Class
+	for rows.Next() {
+		var class models.Class
+		if err := rows.Scan(
+			&class.ID, &class.Name, &class.Description,
+			&class.Teacher_ID, &class.Teacher_Name,
+		); err != nil {
+			return nil, 0, err
+		}
+		classes = append(classes, class)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, 0, err
+	}
+
+	// Hitung total semua kelas untuk student ini
+	countSb := sqlbuilder.NewSelectBuilder()
+	countSb.Select("COUNT(*)").
+		From("assigned_students_class").
+		Where(countSb.Equal("student_id", studentID))
+
+	countQuery, countArgs := countSb.BuildWithFlavor(sqlbuilder.PostgreSQL)
+	var total int
+	err = config.DB.QueryRow(ctx, countQuery, countArgs...).Scan(&total)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	return classes, total, nil
+}

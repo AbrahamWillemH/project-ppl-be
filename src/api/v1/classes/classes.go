@@ -210,3 +210,60 @@ func GetClassIDHandler(c *gin.Context) {
 		"total":    total,
 	})
 }
+
+// GetClassForStudentHandler retrieves assigned classes for a student by ID
+// @Summary Get classes for a student
+// @Description Fetch assigned classes for a student using their ID with pagination
+// @Tags Classes
+// @Security BearerAuth
+// @Accept  json
+// @Produce json
+// @Param id query int true "Student ID"
+// @Param page query int false "Page number (default: 1)"
+// @Param pageSize query int false "Number of items per page (default: 15)"
+// @Success 200 {object} map[string]interface{}
+// @Router /api/v1/classes/assigned [get]
+func GetClassForStudentHandler(c *gin.Context) {
+	// Ambil student ID dari query
+	idStr := c.Query("id")
+	studentID, err := strconv.Atoi(idStr)
+	if err != nil || studentID <= 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid or missing student ID"})
+		return
+	}
+
+	// Ambil parameter pagination
+	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+	pageSize, _ := strconv.Atoi(c.DefaultQuery("pageSize", "15"))
+
+	if page < 1 {
+		page = 1
+	}
+	if pageSize < 1 {
+		pageSize = 15
+	}
+
+	// Ambil data dari repository
+	classes, total, err := classesRepo.GetClassesByStudentID(context.Background(), studentID, page, pageSize)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Jika tidak ada kelas ditemukan
+	if len(classes) == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"message": "No classes found for the student"})
+		return
+	}
+
+	// Kirim response
+	c.JSON(http.StatusOK, gin.H{
+		"classes": classes,
+		"meta": gin.H{
+			"page":      page,
+			"pageSize":  pageSize,
+			"total":     total,
+			"totalPage": int(math.Ceil(float64(total) / float64(pageSize))),
+		},
+	})
+}

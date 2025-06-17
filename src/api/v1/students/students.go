@@ -180,3 +180,38 @@ func StudentDeleteHandler(c *gin.Context) {
 	// Respond with success message
 	c.JSON(http.StatusOK, gin.H{"message": "Student deleted successfully"})
 }
+
+// StudentGetByIDHandler retrieves a student by their ID
+// @Summary Get Student by ID
+// @Description Fetch a single student from the database by their ID
+// @Tags Students
+// @Security BearerAuth
+// @Accept  json
+// @Produce  json
+// @Param id query int true "Student ID"
+// @Success 200 {object} models.Student
+// @Router /api/v1/students/details [get]
+func StudentGetByIDHandler(c *gin.Context) {
+	// Ambil parameter ID dari path
+	idStr := c.Query("id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil || id <= 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid or missing student ID"})
+		return
+	}
+
+	// Ambil data student berdasarkan ID
+	student, err := studentRepo.GetStudentByID(context.Background(), id)
+	if err != nil {
+		// Misal repositori return error kalau student tidak ditemukan
+		if err.Error() == "student not found" {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Student not found"})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Respon dengan data student
+	c.JSON(http.StatusOK, student)
+}

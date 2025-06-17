@@ -194,3 +194,33 @@ func (r *StudentRepository) MigrateStudentGrade(ctx context.Context, migrate str
 
 	return nil
 }
+
+// GetStudentByID retrieves a student by their ID
+func (r *StudentRepository) GetStudentByID(ctx context.Context, id int) (models.Student, error) {
+	sb := sqlbuilder.NewSelectBuilder()
+	sb.Select(
+		"id", "name", "nis", "phone_number", "grade", "curr_score", "status", "profile_picture_url", "user_id",
+	).From("students").
+		Where(sb.Equal("id", id)).
+		Limit(1)
+
+	query, args := sb.BuildWithFlavor(sqlbuilder.PostgreSQL)
+
+	var student models.Student
+	err := config.DB.QueryRow(ctx, query, args...).Scan(
+		&student.ID,
+		&student.Name,
+		&student.NIS,
+		&student.Phone_Number,
+		&student.Grade,
+		&student.Current_Score,
+		&student.Status,
+		&student.Profile_Picture_URL,
+		&student.User_ID,
+	)
+	if err != nil {
+		return models.Student{}, err
+	}
+
+	return student, nil
+}

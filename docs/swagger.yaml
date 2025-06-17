@@ -431,6 +431,38 @@ paths:
       summary: Assign Students to Class
       tags:
       - Classes
+  /api/v1/classes/assigned:
+    get:
+      consumes:
+      - application/json
+      description: Fetch assigned classes for a student using their ID with pagination
+      parameters:
+      - description: Student ID
+        in: query
+        name: id
+        required: true
+        type: integer
+      - description: 'Page number (default: 1)'
+        in: query
+        name: page
+        type: integer
+      - description: 'Number of items per page (default: 15)'
+        in: query
+        name: pageSize
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get classes for a student
+      tags:
+      - Classes
   /api/v1/classes/class-id:
     get:
       consumes:
@@ -923,6 +955,29 @@ paths:
       security:
       - BearerAuth: []
       summary: Create Student
+      tags:
+      - Students
+  /api/v1/students/details:
+    get:
+      consumes:
+      - application/json
+      description: Fetch a single student from the database by their ID
+      parameters:
+      - description: Student ID
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Student'
+      security:
+      - BearerAuth: []
+      summary: Get Student by ID
       tags:
       - Students
   /api/v1/students/grade-migrate:
