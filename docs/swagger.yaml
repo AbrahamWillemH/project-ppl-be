@@ -54,6 +54,26 @@ definitions:
       topic:
         type: string
     type: object
+  models.CreateExerciseAnswersRequest:
+    properties:
+      answers: {}
+      exercise_id:
+        type: integer
+      teacher_id:
+        type: integer
+    type: object
+  models.CreateExercisesRequest:
+    properties:
+      content: {}
+      material_id:
+        type: integer
+      teacher_id:
+        type: integer
+      title:
+        type: string
+      total_marks:
+        type: integer
+    type: object
   models.CreateMaterialRequest:
     properties:
       class_id:
@@ -116,6 +136,30 @@ definitions:
         type: integer
       topic:
         type: string
+    type: object
+  models.ExerciseAnswers:
+    properties:
+      answers: {}
+      exercise_id:
+        type: integer
+      id:
+        type: integer
+      teacher_id:
+        type: integer
+    type: object
+  models.Exercises:
+    properties:
+      content: {}
+      id:
+        type: integer
+      material_id:
+        type: integer
+      teacher_id:
+        type: integer
+      title:
+        type: string
+      total_marks:
+        type: integer
     type: object
   models.Material:
     properties:
@@ -693,6 +737,164 @@ paths:
       summary: Reply or comment on a Discussion
       tags:
       - Discussions
+  /api/v1/exercises:
+    delete:
+      consumes:
+      - application/json
+      description: Delete an exercise by ID
+      parameters:
+      - description: Exercise ID
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete Exercise
+      tags:
+      - Exercises
+    get:
+      consumes:
+      - application/json
+      description: Fetch all exercises for a specific material
+      parameters:
+      - description: Material ID
+        in: query
+        name: material_id
+        required: true
+        type: integer
+      - description: Number
+        in: query
+        name: number
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Exercises'
+            type: array
+      security:
+      - BearerAuth: []
+      summary: Get Exercises by Material ID
+      tags:
+      - Exercises
+    patch:
+      consumes:
+      - application/json
+      description: Update an existing exercise
+      parameters:
+      - description: Exercise ID
+        in: query
+        name: id
+        required: true
+        type: integer
+      - description: Updated data
+        in: body
+        name: exercise
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateExercisesRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Exercises'
+      security:
+      - BearerAuth: []
+      summary: Update Exercise
+      tags:
+      - Exercises
+    post:
+      consumes:
+      - application/json
+      description: Create a new exercise
+      parameters:
+      - description: Exercise data
+        in: body
+        name: exercise
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateExercisesRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Exercises'
+      security:
+      - BearerAuth: []
+      summary: Create Exercise
+      tags:
+      - Exercises
+  /api/v1/exercises-answers:
+    get:
+      consumes:
+      - application/json
+      description: Fetch all exercises for a specific material
+      parameters:
+      - description: Exercise ID
+        in: query
+        name: exercise_id
+        required: true
+        type: integer
+      - description: Number
+        in: query
+        name: number
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.ExerciseAnswers'
+            type: array
+      security:
+      - BearerAuth: []
+      summary: Get Exercise Answers by Exercise ID
+      tags:
+      - Exercises
+    post:
+      consumes:
+      - application/json
+      description: Create a new exercise
+      parameters:
+      - description: Exercise answers data
+        in: body
+        name: exercise
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateExerciseAnswersRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ExerciseAnswers'
+      security:
+      - BearerAuth: []
+      summary: Create Exercise Answers
+      tags:
+      - Exercises
   /api/v1/materials:
     delete:
       consumes:

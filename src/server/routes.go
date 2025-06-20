@@ -11,6 +11,7 @@ import (
 	students "project-ppl-be/src/api/v1/students"
 	teachers "project-ppl-be/src/api/v1/teachers"
 	users "project-ppl-be/src/api/v1/users"
+	exercises "project-ppl-be/src/api/v1/exercises"
 
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
@@ -91,11 +92,19 @@ func SetupRouter() *gin.Engine {
 
 		// EXERCISES
 		exercisesGroup := v1Group.Group("/exercises")
-		exercisesGroup.Use(middleware.AuthMiddleware(), middleware.TeacherMiddleware())
-		exercisesGroup.GET("", materials.MaterialsGetHandler)
-		exercisesGroup.POST("", materials.MaterialsPostHandler)
-		exercisesGroup.PATCH("", materials.MaterialsUpdateHandler)
-		exercisesGroup.DELETE("", materials.MaterialsDeleteHandler)
+		exercisesGroup.Use(middleware.AuthMiddleware())
+		exercisesGroup.GET("", exercises.ExercisesGetByMaterialHandler)
+		exercisesGroup.POST("", exercises.ExercisesPostHandler)
+		exercisesGroup.PATCH("", exercises.ExercisesUpdateHandler)
+		exercisesGroup.DELETE("", exercises.ExercisesDeleteHandler)
+
+		// EXERCISE ANSWERS
+		exerciseAnswersGroup := v1Group.Group("/exercises-answers")
+		exerciseAnswersGroup.Use(middleware.AuthMiddleware())
+		exerciseAnswersGroup.GET("", exercises.ExerciseAnswersGetHandler)
+		exerciseAnswersGroup.POST("", exercises.ExerciseAnswersPostHandler)
+		// exerciseAnswersGroup.PATCH("", exercises.ExercisesUpdateHandler)
+		// exercisesGroup.DELETE("", exercises.ExercisesDeleteHandler)
 
 		// DISCUSSIONS
 		discussionsGroup := v1Group.Group("/discussions")
