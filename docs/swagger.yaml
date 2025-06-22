@@ -9,6 +9,20 @@ definitions:
     - password
     - username
     type: object
+  models.CalculateExamGrades:
+    properties:
+      exam_id:
+        type: integer
+      student_id:
+        type: integer
+    type: object
+  models.CalculateExerciseGrades:
+    properties:
+      exercise_id:
+        type: integer
+      student_id:
+        type: integer
+    type: object
   models.Class:
     properties:
       description:
@@ -54,12 +68,36 @@ definitions:
       topic:
         type: string
     type: object
+  models.CreateExamAnswersRequest:
+    properties:
+      answers: {}
+      exam_id:
+        type: integer
+      student_id:
+        type: integer
+    type: object
+  models.CreateExamsRequest:
+    properties:
+      class_id:
+        type: integer
+      content: {}
+      end_time:
+        type: string
+      start_time:
+        type: string
+      teacher_id:
+        type: integer
+      title:
+        type: string
+      total_marks:
+        type: integer
+    type: object
   models.CreateExerciseAnswersRequest:
     properties:
       answers: {}
       exercise_id:
         type: integer
-      teacher_id:
+      student_id:
         type: integer
     type: object
   models.CreateExercisesRequest:
@@ -137,6 +175,50 @@ definitions:
       topic:
         type: string
     type: object
+  models.ExamAnswers:
+    properties:
+      answers: {}
+      exam_id:
+        type: integer
+      id:
+        type: integer
+      status:
+        type: string
+      student_id:
+        type: integer
+    type: object
+  models.ExamGrades:
+    properties:
+      detail: {}
+      exam_id:
+        type: integer
+      id:
+        type: integer
+      score:
+        type: number
+      student_id:
+        type: integer
+    type: object
+  models.Exams:
+    properties:
+      class_id:
+        type: integer
+      content: {}
+      end_time:
+        type: string
+      id:
+        type: integer
+      start_time:
+        type: string
+      status:
+        type: string
+      teacher_id:
+        type: integer
+      title:
+        type: string
+      total_marks:
+        type: integer
+    type: object
   models.ExerciseAnswers:
     properties:
       answers: {}
@@ -144,7 +226,21 @@ definitions:
         type: integer
       id:
         type: integer
-      teacher_id:
+      status:
+        type: string
+      student_id:
+        type: integer
+    type: object
+  models.ExerciseGrades:
+    properties:
+      detail: {}
+      exercise_id:
+        type: integer
+      id:
+        type: integer
+      score:
+        type: number
+      student_id:
         type: integer
     type: object
   models.Exercises:
@@ -231,6 +327,15 @@ definitions:
       status:
         type: string
       user_id:
+        type: string
+    type: object
+  models.UpdateDiscussionRequest:
+    properties:
+      description:
+        type: string
+      student_id:
+        type: integer
+      topic:
         type: string
     type: object
   models.UpdateMaterialRequest:
@@ -672,7 +777,7 @@ paths:
         name: discussion
         required: true
         schema:
-          $ref: '#/definitions/models.CreateDiscussionRequest'
+          $ref: '#/definitions/models.UpdateDiscussionRequest'
       produces:
       - application/json
       responses:
@@ -737,6 +842,316 @@ paths:
       summary: Reply or comment on a Discussion
       tags:
       - Discussions
+  /api/v1/exams:
+    delete:
+      consumes:
+      - application/json
+      description: Delete an exam by ID
+      parameters:
+      - description: Exam ID
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete Exam
+      tags:
+      - Exams
+    get:
+      consumes:
+      - application/json
+      description: Fetch exam from a class
+      parameters:
+      - description: Class ID
+        in: query
+        name: class_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Exams'
+            type: array
+      security:
+      - BearerAuth: []
+      summary: Get Exams by Class ID
+      tags:
+      - Exams
+    patch:
+      consumes:
+      - application/json
+      description: Update an existing exam
+      parameters:
+      - description: Exam ID
+        in: query
+        name: id
+        required: true
+        type: integer
+      - description: Updated data
+        in: body
+        name: exam
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateExamsRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Exams'
+      security:
+      - BearerAuth: []
+      summary: Update Exam
+      tags:
+      - Exams
+    post:
+      consumes:
+      - application/json
+      description: Create a new exam
+      parameters:
+      - description: Exam data
+        in: body
+        name: exam
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateExamsRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Exams'
+      security:
+      - BearerAuth: []
+      summary: Create Exam
+      tags:
+      - Exams
+  /api/v1/exams-answers:
+    delete:
+      consumes:
+      - application/json
+      description: Delete an exam answer by ID
+      parameters:
+      - description: Exam ID
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete Exam Answer
+      tags:
+      - Exam Answers (Student Answers)
+    get:
+      consumes:
+      - application/json
+      description: Fetch all exams for a specific material
+      parameters:
+      - description: Exam ID
+        in: query
+        name: exam_id
+        required: true
+        type: integer
+      - description: Student ID
+        in: query
+        name: student_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.ExamAnswers'
+            type: array
+      security:
+      - BearerAuth: []
+      summary: Get Exam Answers by Exam ID
+      tags:
+      - Exam Answers (Student Answers)
+    patch:
+      consumes:
+      - application/json
+      description: Update an existing exam answer
+      parameters:
+      - description: Exam Answer ID (Student's Answer ID)
+        in: query
+        name: id
+        required: true
+        type: integer
+      - description: Updated data
+        in: body
+        name: exam
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateExamAnswersRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ExamAnswers'
+      security:
+      - BearerAuth: []
+      summary: Update Exam Answer
+      tags:
+      - Exam Answers (Student Answers)
+    post:
+      consumes:
+      - application/json
+      description: Create a new exam
+      parameters:
+      - description: Exam answers data
+        in: body
+        name: exam
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateExamAnswersRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ExamAnswers'
+      security:
+      - BearerAuth: []
+      summary: Create Exam Answers
+      tags:
+      - Exam Answers (Student Answers)
+  /api/v1/exams/calculate-grade:
+    post:
+      consumes:
+      - application/json
+      description: Calculate grade after submitting exam
+      parameters:
+      - description: Exam grades data
+        in: body
+        name: exam
+        required: true
+        schema:
+          $ref: '#/definitions/models.CalculateExamGrades'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ExamGrades'
+      security:
+      - BearerAuth: []
+      summary: Calculate Grade
+      tags:
+      - Exam Answers (Student Answers)
+  /api/v1/exams/get-all-grade:
+    get:
+      consumes:
+      - application/json
+      description: Get calculated grades for all exams
+      parameters:
+      - description: Student ID
+        in: query
+        name: student_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ExamGrades'
+      security:
+      - BearerAuth: []
+      summary: Get ALl Grades
+      tags:
+      - Exam Answers (Student Answers)
+  /api/v1/exams/get-grade:
+    get:
+      consumes:
+      - application/json
+      description: Get calculated grade
+      parameters:
+      - description: Exam ID
+        in: query
+        name: exam_id
+        required: true
+        type: integer
+      - description: Student ID
+        in: query
+        name: student_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ExamGrades'
+      security:
+      - BearerAuth: []
+      summary: Get Grade
+      tags:
+      - Exam Answers (Student Answers)
+  /api/v1/exams/student:
+    get:
+      consumes:
+      - application/json
+      description: Fetch all exams for a specific class
+      parameters:
+      - description: Class ID
+        in: query
+        name: class_id
+        required: true
+        type: integer
+      - description: Number
+        in: query
+        name: number
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Exams'
+            type: array
+      security:
+      - BearerAuth: []
+      summary: Get Exams for Student
+      tags:
+      - Exams
   /api/v1/exercises:
     delete:
       consumes:
@@ -770,11 +1185,6 @@ paths:
       - description: Material ID
         in: query
         name: material_id
-        required: true
-        type: integer
-      - description: Number
-        in: query
-        name: number
         required: true
         type: integer
       produces:
@@ -843,6 +1253,30 @@ paths:
       tags:
       - Exercises
   /api/v1/exercises-answers:
+    delete:
+      consumes:
+      - application/json
+      description: Delete an exercise answer by ID
+      parameters:
+      - description: Exercise ID
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete Exercise Answer
+      tags:
+      - Exercise Answers (Student Answers)
     get:
       consumes:
       - application/json
@@ -853,9 +1287,9 @@ paths:
         name: exercise_id
         required: true
         type: integer
-      - description: Number
+      - description: Student ID
         in: query
-        name: number
+        name: student_id
         required: true
         type: integer
       produces:
@@ -871,7 +1305,35 @@ paths:
       - BearerAuth: []
       summary: Get Exercise Answers by Exercise ID
       tags:
-      - Exercises
+      - Exercise Answers (Student Answers)
+    patch:
+      consumes:
+      - application/json
+      description: Update an existing exercise answer
+      parameters:
+      - description: Exercise Answer ID (Student's Answer ID)
+        in: query
+        name: id
+        required: true
+        type: integer
+      - description: Updated data
+        in: body
+        name: exercise
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateExerciseAnswersRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ExerciseAnswers'
+      security:
+      - BearerAuth: []
+      summary: Update Exercise Answer
+      tags:
+      - Exercise Answers (Student Answers)
     post:
       consumes:
       - application/json
@@ -893,6 +1355,111 @@ paths:
       security:
       - BearerAuth: []
       summary: Create Exercise Answers
+      tags:
+      - Exercise Answers (Student Answers)
+  /api/v1/exercises/calculate-grade:
+    post:
+      consumes:
+      - application/json
+      description: Calculate grade after submitting exercise
+      parameters:
+      - description: Exercise grades data
+        in: body
+        name: exercise
+        required: true
+        schema:
+          $ref: '#/definitions/models.CalculateExerciseGrades'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ExerciseGrades'
+      security:
+      - BearerAuth: []
+      summary: Calculate Grade
+      tags:
+      - Exercise Answers (Student Answers)
+  /api/v1/exercises/get-all-grade:
+    get:
+      consumes:
+      - application/json
+      description: Get calculated grades for all materials
+      parameters:
+      - description: Student ID
+        in: query
+        name: student_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ExerciseGrades'
+      security:
+      - BearerAuth: []
+      summary: Get All Grades
+      tags:
+      - Exercise Answers (Student Answers)
+  /api/v1/exercises/get-grade:
+    get:
+      consumes:
+      - application/json
+      description: Get calculated grade
+      parameters:
+      - description: Exercise ID
+        in: query
+        name: exercise_id
+        required: true
+        type: integer
+      - description: Student ID
+        in: query
+        name: student_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ExerciseGrades'
+      security:
+      - BearerAuth: []
+      summary: Get Grade
+      tags:
+      - Exercise Answers (Student Answers)
+  /api/v1/exercises/student:
+    get:
+      consumes:
+      - application/json
+      description: Fetch all exercises for a specific material
+      parameters:
+      - description: Material ID
+        in: query
+        name: material_id
+        required: true
+        type: integer
+      - description: Number
+        in: query
+        name: number
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Exercises'
+            type: array
+      security:
+      - BearerAuth: []
+      summary: Get Exercises for Student
       tags:
       - Exercises
   /api/v1/materials:

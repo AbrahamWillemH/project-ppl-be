@@ -1,0 +1,2 @@
+ALTER TABLE exam_answers ALTER COLUMN answers DROP NOT NULL;
+ALTER TABLE exercise_answers ALTER COLUMN answers DROP NOT NULL;

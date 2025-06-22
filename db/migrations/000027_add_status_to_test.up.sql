@@ -1,0 +1,2 @@
+ALTER TABLE exams
+ADD COLUMN status VARCHAR(10);

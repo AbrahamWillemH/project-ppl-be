@@ -78,19 +78,18 @@ func (r *DiscussionRepository) CreateDiscussion(ctx context.Context, studentID i
 }
 
 // UpdateDiscussion updates an existing discussion
-func (r *DiscussionRepository) UpdateDiscussion(ctx context.Context, id int, studentID int, topic, description string, replies any) (models.Discussion, error) {
+func (r *DiscussionRepository) UpdateDiscussion(ctx context.Context, id int, studentID int, topic, description string) (models.Discussion, error) {
 	sb := sqlbuilder.NewUpdateBuilder()
 	sb.Update("general_forum").
 		Set(
 			sb.Assign("student_id", studentID),
 			sb.Assign("topic", topic),
 			sb.Assign("description", description),
-			sb.Assign("replies", replies),
 		).
 		Where(sb.Equal("id", id))
 
 	query, args := sb.BuildWithFlavor(sqlbuilder.PostgreSQL)
-	query += " RETURNING id, student_id, topic, description, replies"
+	query += " RETURNING id, student_id, topic, description"
 
 	var discussion models.Discussion
 	err := config.DB.QueryRow(ctx, query, args...).Scan(
@@ -98,7 +97,6 @@ func (r *DiscussionRepository) UpdateDiscussion(ctx context.Context, id int, stu
 		&discussion.Student_ID,
 		&discussion.Topic,
 		&discussion.Description,
-		&discussion.Replies,
 	)
 	if err != nil {
 		return models.Discussion{}, err

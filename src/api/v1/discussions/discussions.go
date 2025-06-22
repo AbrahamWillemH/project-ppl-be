@@ -94,11 +94,11 @@ func DiscussionsPostHandler(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param id query int true "Discussion ID"
-// @Param discussion body models.CreateDiscussionRequest true "Updated Discussion Data"
+// @Param discussion body models.UpdateDiscussionRequest true "Updated Discussion Data"
 // @Success 200 {object} models.Discussion
 // @Router /api/v1/discussions [patch]
 func DiscussionsUpdateHandler(c *gin.Context) {
-	var req models.CreateDiscussionRequest
+	var req models.UpdateDiscussionRequest
 
 	idStr := c.Query("id")
 	id, err := strconv.Atoi(idStr)
@@ -118,7 +118,6 @@ func DiscussionsUpdateHandler(c *gin.Context) {
 		req.Student_ID,
 		req.Topic,
 		req.Description,
-		req.Replies,
 	)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})

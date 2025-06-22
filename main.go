@@ -18,13 +18,15 @@ import (
 	_ "project-ppl-be/docs"
 	"project-ppl-be/src/server"
 
+	utils "project-ppl-be/src/utils"
+
 	"github.com/rs/cors"
 )
 
 func main() {
 	// Initialize the database
-	config.ConnectDB()
-	defer config.CloseDB()
+	db := config.ConnectDB()
+	defer db.Close()
 
 	// Set up the Gin router with db
 	router := server.SetupRouter()
@@ -34,6 +36,9 @@ func main() {
 
 	// Wrap the Gin router with CORS
 	handler := corsHandler.Handler(router)
+
+	// Start Cron
+	utils.StartCron(db)
 
 	// Start the server with the wrapped handler
 	log.Fatal(http.ListenAndServe(":8080", handler))

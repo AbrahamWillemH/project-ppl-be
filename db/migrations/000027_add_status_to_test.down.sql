@@ -1,0 +1,2 @@
+ALTER TABLE exams
+DROP COLUMN status;

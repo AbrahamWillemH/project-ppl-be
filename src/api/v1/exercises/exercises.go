@@ -19,7 +19,6 @@ var exercisesRepo = repo.ExerciseRepository{}
 // @Accept json
 // @Produce json
 // @Param material_id query int true "Material ID"
-// @Param number query int true "Number"
 // @Success 200 {array} models.Exercises
 // @Router /api/v1/exercises [get]
 func ExercisesGetByMaterialHandler(c *gin.Context) {
@@ -31,6 +30,40 @@ func ExercisesGetByMaterialHandler(c *gin.Context) {
 	}
 
 	exercises, err := exercisesRepo.GetExercisesByMaterialID(context.Background(), materialID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, exercises)
+}
+
+// @Summary Get Exercises for Student
+// @Description Fetch all exercises for a specific material
+// @Tags Exercises
+// @Security BearerAuth
+// @Accept json
+// @Produce json
+// @Param material_id query int true "Material ID"
+// @Param number query int true "Number"
+// @Success 200 {array} models.Exercises
+// @Router /api/v1/exercises/student [get]
+func ExercisesGetByMaterialForStudentHandler(c *gin.Context) {
+	materialIDStr := c.Query("material_id")
+	numberStr := c.Query("number")
+	materialID, err := strconv.Atoi(materialIDStr)
+	if err != nil || materialID <= 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid or missing material_id"})
+		return
+	}
+
+	number, err := strconv.Atoi(numberStr)
+	if err != nil || number <= 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid or missing number"})
+		return
+	}
+
+	exercises, err := exercisesRepo.GetExercisesByMaterialIDForStudent(context.Background(), materialID, number)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
